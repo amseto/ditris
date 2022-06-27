@@ -4,7 +4,6 @@ import styles from "./Grid.module.css";
 import Block from "./Block";
 
 const Grid = (props) => {
-
   const gameState = useSelector((state) => state.gameState);
 
   const grid = gameState.grid.slice(1).map((row, y_pos) => {
