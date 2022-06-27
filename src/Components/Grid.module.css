@@ -1,0 +1,8 @@
+.grid{
+    border-collapse:collapse;
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 40%;
+    
+
+}

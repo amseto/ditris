@@ -1,0 +1,8 @@
+.heldBlock table{
+    border-collapse:collapse;
+    display: flex;
+    flex-wrap: wrap;
+    border:0px solid;
+    width: 96px;
+    height: 72px;
+}

@@ -1,0 +1,53 @@
+.block {
+  height: 24px;
+  width: 24px;
+
+}
+.None {
+  background-color: black;
+} /*.None*/
+.I {
+  background-color: cyan;
+} /*I*/
+
+.T {
+  background-color: purple;
+} /*T*/
+.L {
+  background-color: orange;
+}
+.J {
+  background-color: blue;
+}
+.Z {
+  background-color: red;
+}
+.S {
+  background-color: green;
+}
+.O {
+  background-color: yellow;
+}
+
+.Ighost {
+  background-color: rgb(0, 122, 122);
+}
+
+.Tghost {
+  background-color: rgb(65, 1, 65);
+}
+.Lghost {
+  background-color: rgb(117, 76, 0);
+}
+.Jghost {
+  background-color: rgb(1, 1, 121);
+}
+.Zghost {
+  background-color: rgb(122, 3, 3);
+}
+.Sghost {
+  background-color: rgb(1, 80, 1);
+}
+.Oghost {
+  background-color: rgb(148, 148, 2);
+}

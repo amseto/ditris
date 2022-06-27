@@ -1,0 +1,19 @@
+.pieceQueue ul{
+    margin-top: 24px;
+    white-space: nowrap;
+    width: 100px;
+    
+    
+}
+
+.pieceQueue li{
+    margin-bottom: 24px;
+    list-style-type: none;
+    
+
+}
+.pieceQueue table{
+    border-collapse:collapse;
+    border:0px solid;
+
+}
