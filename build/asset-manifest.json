@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/amseto.github.io/static/css/main.d9413f3f.chunk.css",
+    "main.js": "/amseto.github.io/static/js/main.aa66d7d0.chunk.js",
+    "main.js.map": "/amseto.github.io/static/js/main.aa66d7d0.chunk.js.map",
+    "runtime-main.js": "/amseto.github.io/static/js/runtime-main.939baeb5.js",
+    "runtime-main.js.map": "/amseto.github.io/static/js/runtime-main.939baeb5.js.map",
+    "static/js/2.2dd70a1d.chunk.js": "/amseto.github.io/static/js/2.2dd70a1d.chunk.js",
+    "static/js/2.2dd70a1d.chunk.js.map": "/amseto.github.io/static/js/2.2dd70a1d.chunk.js.map",
+    "index.html": "/amseto.github.io/index.html",
+    "static/css/main.d9413f3f.chunk.css.map": "/amseto.github.io/static/css/main.d9413f3f.chunk.css.map",
+    "static/js/2.2dd70a1d.chunk.js.LICENSE.txt": "/amseto.github.io/static/js/2.2dd70a1d.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.939baeb5.js",
+    "static/js/2.2dd70a1d.chunk.js",
+    "static/css/main.d9413f3f.chunk.css",
+    "static/js/main.aa66d7d0.chunk.js"
+  ]
+}
