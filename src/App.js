@@ -7,48 +7,21 @@ import { gameStateActions } from "./store/GameState";
 import Grid from "./Components/Grid";
 import PieceQueue from "./Components/PieceQueue";
 import HeldBlock from "./Components/HeldBlock";
-import ReadyGo from './Components/ReadyGo'
+
+import {keyShiftCounter,keyIsPressed,keyIsDisabled} from "./modules/KeyControls";
+import KeyControls from "./modules/KeyControls"
+import HowToPlay from "./Components/HowToPlay";
 
 function App() {
   const dispatch = useDispatch();
-  const gameState = useSelector((state) => state.gameState);
-  const buttonClickHander = () => {
-    dispatch(gameStateActions.newGame());
-    dispatch(gameStateActions.getNewPiece());
-  };
-  const rotateButtonHandler = () => {
-    dispatch(gameStateActions.rotatePiece());
-  };
-  const dropPieceHandler = () => {
-    dispatch(gameStateActions.dropPiece());
-  };
-  const shiftLeftHandler = () => {
-    dispatch(gameStateActions.shiftLeft());
-  };
-  const shiftRightHandler = () => {
-    dispatch(gameStateActions.shiftRight());
-  };
+  const gameRunning =  useSelector((state) => state.gameState.gameRunning);
+  const currentPieceState = useSelector((state) => state.gameState.currentPieceState);
+  const displayMessage = useSelector((state) => state.gameState.displayMessage);
 
-  let keyState = {};
-
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Tab") {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    if (event.key === " ") {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    keyState[event.key] = true;
-  });
-  window.addEventListener("keyup", (event) => {
-    keyState[event.key] = false;
-  });
 
   const gameLoop = () => {
-    if (gameState.gameRunning) {
-      if (gameState.currentPieceState === "FROZEN") {
+    if (gameRunning) {
+      if (currentPieceState === "FROZEN") {
         dispatch(gameStateActions.clearLines());
         dispatch(gameStateActions.checkIfGameWon());
         dispatch(gameStateActions.getNewPiece());
@@ -68,12 +41,17 @@ function App() {
     }, 300);
     const handleInputInterval = window.setInterval(() => {
       keyHandler();
-    }, 10);
+    }, 1);
+    const shiftInputInterval = window.setInterval(()=>{
+      keyShiftHandler();
+    },1)
+
     return () => {
       window.clearInterval(dropPieceInterval);
       window.clearInterval(handleInputInterval);
+      window.clearInterval(shiftInputInterval);
     };
-  }, [gameState, gameLoop, keyState]);
+  });
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -82,42 +60,87 @@ function App() {
     return () => {
       window.clearInterval(interval);
     };
-  }, [gameState.displayMessage, dispatch]);
+  }, [displayMessage, dispatch]);
 
-  const keyHandler = () => {
-    if (!gameState.gameRunning) {
+
+  const keyShiftHandler = () =>{
+    if (!gameRunning) {
       return;
     }
-    if (keyState["q"]) {
-      dispatch(gameStateActions.rotatePiece(true));
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
+    for (let key in keyShiftCounter){
+      if(keyShiftCounter[key]){
+        keyShiftCounter[key]+=1
+      }
     }
-    if (keyState["w"]) {
-      dispatch(gameStateActions.rotatePiece(false));
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-    }
-    if (keyState["ArrowDown"]) {
+    if (keyIsPressed["ArrowDown"]&&keyIsDisabled["ArrowDown"]&&keyShiftCounter["ArrowDown"]>40) {
+      console.log("down");
       dispatch(gameStateActions.dropPiece());
+      keyIsDisabled["ArrowDown"] = true
+      keyShiftCounter["ArrowDown"]=20
     }
-    if (keyState["ArrowRight"]) {
+    if (keyIsPressed["ArrowRight"]&&keyIsDisabled["ArrowRight"]&&keyShiftCounter["ArrowRight"]>40) {
+      console.log("right");
       dispatch(gameStateActions.shiftRight());
       dispatch(gameStateActions.getGhostCoords());
       dispatch(gameStateActions.showGhostPiece());
+      keyIsDisabled["ArrowRight"] = true
+      keyShiftCounter["ArrowRight"]=20
     }
-    if (keyState["ArrowLeft"]) {
+    if (keyIsPressed["ArrowLeft"]&&keyIsDisabled["ArrowLeft"]&&keyShiftCounter["ArrowLeft"]>40) {
+      console.log("left");
       dispatch(gameStateActions.shiftLeft());
       dispatch(gameStateActions.getGhostCoords());
       dispatch(gameStateActions.showGhostPiece());
+      keyIsDisabled["ArrowLeft"] = true
+      keyShiftCounter["ArrowLeft"]=20
     }
-    if (keyState[" "]) {
+
+  }
+  const keyHandler = () => {
+    if (!gameRunning) {
+      return;
+    }
+    if (keyIsPressed["q"]&&!keyIsDisabled["q"]) {
+      console.log("rotateLeft");
+      dispatch(gameStateActions.rotatePiece(true));
+      dispatch(gameStateActions.getGhostCoords());
+      dispatch(gameStateActions.showGhostPiece());
+      keyIsDisabled["q"] = true
+    }
+    if (keyIsPressed["w"]&&!keyIsDisabled["w"]) {
+      console.log("rotateRight");
+      dispatch(gameStateActions.rotatePiece(false));
+      dispatch(gameStateActions.getGhostCoords());
+      dispatch(gameStateActions.showGhostPiece());
+      keyIsDisabled["w"] = true
+    }
+    if (keyIsPressed[" "]&&!keyIsDisabled[" "]) {
       dispatch(gameStateActions.hardDrop());
+      keyIsDisabled[" "] = true
     }
-    if (keyState["Tab"]) {
+    if (keyIsPressed["Tab"]&&!keyIsDisabled["Tab"]) {
       dispatch(gameStateActions.holdPiece());
       dispatch(gameStateActions.getGhostCoords());
       dispatch(gameStateActions.showGhostPiece());
+      keyIsDisabled["Tab"] = true
+    }
+    if (keyIsPressed["ArrowDown"]&&!keyIsDisabled["ArrowDown"]) {
+      dispatch(gameStateActions.dropPiece());
+      keyIsDisabled["ArrowDown"] = true
+    }
+    if (keyIsPressed["ArrowRight"]&&!keyIsDisabled["ArrowRight"]) {
+      keyShiftCounter["ArrowRight"] = 1
+      dispatch(gameStateActions.shiftRight());
+      dispatch(gameStateActions.getGhostCoords());
+      dispatch(gameStateActions.showGhostPiece());
+      keyIsDisabled["ArrowRight"] = true
+    }
+    if (keyIsPressed["ArrowLeft"]&&!keyIsDisabled["ArrowLeft"]) {
+      keyShiftCounter["ArrowLeft"] = 1
+      dispatch(gameStateActions.shiftLeft());
+      dispatch(gameStateActions.getGhostCoords());
+      dispatch(gameStateActions.showGhostPiece());
+      keyIsDisabled["ArrowLeft"] = true
     }
   };
   document.onkeydown = (keycode) => {
@@ -130,21 +153,14 @@ function App() {
   };
   return (
     <Fragment>
+      <KeyControls/>
       <h1>Ditris</h1>
-      <button onClick={buttonClickHander}>Start/Pause</button>
-      <button onClick={rotateButtonHandler}>Rotate</button>
-      <button onClick={dropPieceHandler}>Drop</button>
-      <button onClick={shiftLeftHandler}>Left</button>
-      <button onClick={shiftRightHandler}>Right</button>
       <div className={styles.gameUI}>
         <HeldBlock />
-        <Grid>
-          <div  style={{ "align-items":"center",position: "absolute", top: 300,color:"yellow"}}>
-            {gameState.displayMessage}
-          </div>
-        </Grid>
+        <Grid></Grid>
         <PieceQueue />
       </div>
+      <HowToPlay></HowToPlay>
     </Fragment>
   );
 }

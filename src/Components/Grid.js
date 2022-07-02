@@ -19,7 +19,9 @@ const Grid = (props) => {
   return (
     <table className={styles.grid}>
       <tbody>{grid}</tbody>
-      {props.children}
+      <div  style={{ "align-items":"center",position: "absolute", top: 300,color:"yellow"}}>
+            {gameState.displayMessage}
+          </div>
     </table>
   );
 };

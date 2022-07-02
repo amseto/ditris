@@ -412,6 +412,9 @@ const gameStateSlice = createSlice({
   name: "gameState",
   initialState: gameStateInitialState,
   reducers: {
+    gameLoop(state){
+
+    },
     newGame(state) {
       pieceArray = [
         "I",
@@ -686,6 +689,7 @@ const gameStateSlice = createSlice({
       state.xPos = 3;
       state.yPos = 0;
       state.rotatePos = 0;
+      state.totalLinesCleared= 0;
       state.displayMessage = "READY"
       state.currentPieceState = "GETTING READY"
       pieceQueue.empty()
@@ -915,6 +919,9 @@ const gameStateSlice = createSlice({
       placeBlocks(state);
       state.currentPieceState = "FALLING";
 
+    },
+    placeBlocks(state){
+      
     }
 
     // setWinCondition(state,condition){
