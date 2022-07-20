@@ -14,6 +14,14 @@ const KeyControls = () => {
       event.preventDefault();
       event.stopPropagation();
     }
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   });
   window.addEventListener("keyup", (event) => {
     keyShiftCounter[event.key] = 0

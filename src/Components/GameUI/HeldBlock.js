@@ -50,7 +50,6 @@ const HeldBlock = () => {
   };
 
   let grid = TETRIMINOS[gameState.heldPiece][0].map(convertToPiece);
-  console.log(grid);
   return (
     <div className={styles.heldBlock}>
       <table>

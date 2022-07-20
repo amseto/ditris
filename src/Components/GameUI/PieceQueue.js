@@ -1,6 +1,6 @@
 import PieceQueuePiece from "./PieceQueuePiece";
 import styles from './PieceQueue.module.css'
-import {pieceQueue} from '../store/GameState'
+import {pieceQueue} from '../../store/GameState'
 
 const PieceQueue= (props) =>{
     let i = 0

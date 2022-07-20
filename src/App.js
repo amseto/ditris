@@ -1,168 +1,110 @@
-import { Fragment, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-
-import styles from "./gameUI.module.css";
-
+import { onAuthStateChanged } from "@firebase/auth";
+import { child, get, onChildAdded, onChildRemoved, onValue } from "@firebase/database";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { auth, onlineUsersRef, roomsRef } from "./modules/firebase-config";
+import SinglePlayer from "./Pages/SinglePlayer";
+import TwoPlayer from "./Pages/TwoPlayer";
 import { gameStateActions } from "./store/GameState";
-import Grid from "./Components/Grid";
-import PieceQueue from "./Components/PieceQueue";
-import HeldBlock from "./Components/HeldBlock";
+import { userInfoActions } from "./store/UserInfo";
+import NavigationBar from "./UI/NavigationBar";
 
-import {keyShiftCounter,keyIsPressed,keyIsDisabled} from "./modules/KeyControls";
-import KeyControls from "./modules/KeyControls"
-import HowToPlay from "./Components/HowToPlay";
+const App = () => {
+   const dispatch = useDispatch();
+   const [page, setPage] = useState(<SinglePlayer></SinglePlayer>);
+   const changePageHandler = (pageName) => {
+      dispatch(gameStateActions.reset());
+      if (pageName === "singleplayer") {
+         setPage(<SinglePlayer></SinglePlayer>);
+      } else if (pageName === "two-player") {
+         setPage(<TwoPlayer></TwoPlayer>);
+      }
+   };
 
-function App() {
-  const dispatch = useDispatch();
-  const gameRunning =  useSelector((state) => state.gameState.gameRunning);
-  const currentPieceState = useSelector((state) => state.gameState.currentPieceState);
-  const displayMessage = useSelector((state) => state.gameState.displayMessage);
-
-
-  const gameLoop = () => {
-    if (gameRunning) {
-      if (currentPieceState === "FROZEN") {
-        dispatch(gameStateActions.clearLines());
-        dispatch(gameStateActions.checkIfGameWon());
-        dispatch(gameStateActions.getNewPiece());
-        dispatch(gameStateActions.getGhostCoords());
-        dispatch(gameStateActions.showGhostPiece());
+   onAuthStateChanged(auth, (user) => {
+      if (user) {
+         dispatch(userInfoActions.login());
+         dispatch(userInfoActions.setRoomStatus("looking for room"));
       } else {
-        dispatch(gameStateActions.dropPiece());
-        dispatch(gameStateActions.getGhostCoords());
-        dispatch(gameStateActions.showGhostPiece());
+         dispatch(userInfoActions.logout());
+         dispatch(userInfoActions.setRoomStatus(null));
       }
-    }
-  };
+   });
 
-  useEffect(() => {
-    const dropPieceInterval = window.setInterval(() => {
-      gameLoop();
-    }, 300);
-    const handleInputInterval = window.setInterval(() => {
-      keyHandler();
-    }, 1);
-    const shiftInputInterval = window.setInterval(()=>{
-      keyShiftHandler();
-    },1)
+   onChildAdded(roomsRef, () => {
+      if (auth.currentUser)
+         get(roomsRef).then((snapshot) => {
+            if (snapshot.exists())
+               dispatch(
+                  userInfoActions.setInvitiationKeys(
+                     Object.entries(snapshot.val())
+                        .filter(
+                           (room) => !room[1].accepted && room[1].player2 === auth.currentUser.uid
+                        )
+                        .map((room) => {
+                           return { opponentuid: room[1].player1, roomKey: room[0] };
+                        })
+                  )
+               );
+         });
+   });
 
-    return () => {
-      window.clearInterval(dropPieceInterval);
-      window.clearInterval(handleInputInterval);
-      window.clearInterval(shiftInputInterval);
-    };
-  });
+   onChildRemoved(roomsRef, () => {
+      if (auth.currentUser)
+         get(roomsRef).then((snapshot) => {
+            if (snapshot.exists()) {
+               dispatch(
+                  userInfoActions.setInvitiationKeys(
+                     Object.entries(snapshot.val())
+                        .filter(
+                           (room) => !room[1].accepted && room[1].player2 === auth.currentUser.uid
+                        )
+                        .map((room) => {
+                           return { opponentuid: room[1].player1, roomKey: room[0] };
+                        })
+                  )
+               );
+            } else {
+               dispatch(userInfoActions.setInvitiationKeys([]));
+            }
+         });
+   });
 
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      dispatch(gameStateActions.gettingReady());
-    }, 500);
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [displayMessage, dispatch]);
-
-
-  const keyShiftHandler = () =>{
-    if (!gameRunning) {
-      return;
-    }
-    for (let key in keyShiftCounter){
-      if(keyShiftCounter[key]){
-        keyShiftCounter[key]+=1
+   onValue(onlineUsersRef, () => {
+      if (auth.currentUser) {
+         get(onlineUsersRef).then((snapshot) => {
+            if (snapshot.val()) {
+               dispatch(
+                  userInfoActions.setOtherUsers(
+                     Object.entries(snapshot.val()).filter(
+                        (pair) => pair[0] !== auth.currentUser.uid && !pair[1].inRoom
+                     )
+                  )
+               );
+            }
+         });
       }
-    }
-    if (keyIsPressed["ArrowDown"]&&keyIsDisabled["ArrowDown"]&&keyShiftCounter["ArrowDown"]>40) {
-      console.log("down");
-      dispatch(gameStateActions.dropPiece());
-      keyIsDisabled["ArrowDown"] = true
-      keyShiftCounter["ArrowDown"]=20
-    }
-    if (keyIsPressed["ArrowRight"]&&keyIsDisabled["ArrowRight"]&&keyShiftCounter["ArrowRight"]>40) {
-      console.log("right");
-      dispatch(gameStateActions.shiftRight());
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-      keyIsDisabled["ArrowRight"] = true
-      keyShiftCounter["ArrowRight"]=20
-    }
-    if (keyIsPressed["ArrowLeft"]&&keyIsDisabled["ArrowLeft"]&&keyShiftCounter["ArrowLeft"]>40) {
-      console.log("left");
-      dispatch(gameStateActions.shiftLeft());
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-      keyIsDisabled["ArrowLeft"] = true
-      keyShiftCounter["ArrowLeft"]=20
-    }
+   });
 
-  }
-  const keyHandler = () => {
-    if (!gameRunning) {
-      return;
-    }
-    if (keyIsPressed["q"]&&!keyIsDisabled["q"]) {
-      console.log("rotateLeft");
-      dispatch(gameStateActions.rotatePiece(true));
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-      keyIsDisabled["q"] = true
-    }
-    if (keyIsPressed["w"]&&!keyIsDisabled["w"]) {
-      console.log("rotateRight");
-      dispatch(gameStateActions.rotatePiece(false));
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-      keyIsDisabled["w"] = true
-    }
-    if (keyIsPressed[" "]&&!keyIsDisabled[" "]) {
-      dispatch(gameStateActions.hardDrop());
-      keyIsDisabled[" "] = true
-    }
-    if (keyIsPressed["Tab"]&&!keyIsDisabled["Tab"]) {
-      dispatch(gameStateActions.holdPiece());
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-      keyIsDisabled["Tab"] = true
-    }
-    if (keyIsPressed["ArrowDown"]&&!keyIsDisabled["ArrowDown"]) {
-      dispatch(gameStateActions.dropPiece());
-      keyIsDisabled["ArrowDown"] = true
-    }
-    if (keyIsPressed["ArrowRight"]&&!keyIsDisabled["ArrowRight"]) {
-      keyShiftCounter["ArrowRight"] = 1
-      dispatch(gameStateActions.shiftRight());
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-      keyIsDisabled["ArrowRight"] = true
-    }
-    if (keyIsPressed["ArrowLeft"]&&!keyIsDisabled["ArrowLeft"]) {
-      keyShiftCounter["ArrowLeft"] = 1
-      dispatch(gameStateActions.shiftLeft());
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-      keyIsDisabled["ArrowLeft"] = true
-    }
-  };
-  document.onkeydown = (keycode) => {
-    if (keycode.key === "Escape") {
-      dispatch(gameStateActions.newGame());
-      dispatch(gameStateActions.getNewPiece());
-      dispatch(gameStateActions.getGhostCoords());
-      dispatch(gameStateActions.showGhostPiece());
-    }
-  };
-  return (
-    <Fragment>
-      <KeyControls/>
-      <h1>Ditris</h1>
-      <div className={styles.gameUI}>
-        <HeldBlock />
-        <Grid></Grid>
-        <PieceQueue />
-      </div>
-      <HowToPlay></HowToPlay>
-    </Fragment>
-  );
-}
+   const roomKey = useSelector((state) => state.userInfo.roomKey);
+   if (roomKey) {
+      onValue(child(roomsRef, roomKey.payload + "/accepted"), (snapshot) => {
+         if (!snapshot.exists()) {
+            dispatch(userInfoActions.setRoomStatus("looking for room"));
+         } else if (snapshot.val()) {
+            dispatch(gameStateActions.setMultiplayer({playerNumber:1,roomRef:child(roomsRef, roomKey.payload)}))
+            dispatch(userInfoActions.setRoomStatus("done waiting"));
+         } else {
+            dispatch(userInfoActions.setRoomStatus("waiting"));
+         }
+      });
+   }
 
+   return (
+      <React.Fragment>
+         <NavigationBar setPage={changePageHandler}></NavigationBar>
+         {page}
+      </React.Fragment>
+   );
+};
 export default App;
