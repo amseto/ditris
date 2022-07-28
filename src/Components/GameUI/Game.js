@@ -9,6 +9,7 @@ import HeldBlock from "./HeldBlock";
 import { keyShiftCounter, keyIsPressed, keyIsDisabled } from "../../modules/KeyControls";
 import KeyControls from "../../modules/KeyControls";
 import HowToPlay from "./HowToPlay";
+import StopWatch from "./StopWatch";
 
 let gameLocked = false;
 
@@ -17,6 +18,7 @@ const Game = () => {
    const gameRunning = useSelector((state) => state.gameState.gameRunning);
    const currentPieceState = useSelector((state) => state.gameState.currentPieceState);
    const displayMessage = useSelector((state) => state.gameState.displayMessage);
+   const controls = useSelector((state)=>state.controls)
 
    const [startGame, setStartGame] = useState(false);
 
@@ -37,7 +39,6 @@ const Game = () => {
    };
    useEffect(() => {
       const dropPieceInterval = window.setInterval(() => {
-      
          gameLoop();
       }, 300);
       const handleInputInterval = window.setInterval(() => {
@@ -74,92 +75,91 @@ const Game = () => {
          }
       }
       if (
-         keyIsPressed["ArrowDown"] &&
-         keyIsDisabled["ArrowDown"] &&
-         keyShiftCounter["ArrowDown"] > 40
+         keyIsPressed[controls.softDrop] &&
+         keyIsDisabled[controls.softDrop] &&
+         keyShiftCounter[controls.softDrop] > 40
       ) {
          dispatch(gameStateActions.dropPiece());
-         keyIsDisabled["ArrowDown"] = true;
-         keyShiftCounter["ArrowDown"] = 30;
+         keyIsDisabled[controls.softDrop] = true;
+         keyShiftCounter[controls.softDrop] = 30;
       }
       if (
-         keyIsPressed["ArrowRight"] &&
-         keyIsDisabled["ArrowRight"] &&
-         keyShiftCounter["ArrowRight"] > 40
+         keyIsPressed[controls.moveRight] &&
+         keyIsDisabled[controls.moveRight] &&
+         keyShiftCounter[controls.moveRight] > 40
       ) {
          dispatch(gameStateActions.shiftRight());
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled["ArrowRight"] = true;
-         keyShiftCounter["ArrowRight"] = 20;
+         keyIsDisabled[controls.moveRight] = true;
+         keyShiftCounter[controls.moveRight] = 30;
       }
       if (
-         keyIsPressed["ArrowLeft"] &&
-         keyIsDisabled["ArrowLeft"] &&
-         keyShiftCounter["ArrowLeft"] > 40
+         keyIsPressed[controls.moveLeft] &&
+         keyIsDisabled[controls.moveLeft] &&
+         keyShiftCounter[controls.moveLeft] > 40
       ) {
          dispatch(gameStateActions.shiftLeft());
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled["ArrowLeft"] = true;
-         keyShiftCounter["ArrowLeft"] = 20;
+         keyIsDisabled[controls.moveLeft] = true;
+         keyShiftCounter[controls.moveLeft] = 30;
       }
    };
    const keyHandler = () => {
       if (!gameRunning || gameLocked) {
          return;
       }
-      if (keyIsPressed["q"] && !keyIsDisabled["q"]) {
+      if (keyIsPressed[controls.rotateLeft] && !keyIsDisabled[controls.rotateLeft]) {
          dispatch(gameStateActions.rotatePiece(true));
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled["q"] = true;
+         keyIsDisabled[controls.rotateLeft] = true;
       }
-      if (keyIsPressed["w"] && !keyIsDisabled["w"]) {
+      if (keyIsPressed[controls.rotateRight] && !keyIsDisabled[controls.rotateRight]) {
          dispatch(gameStateActions.rotatePiece(false));
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled["w"] = true;
+         keyIsDisabled[controls.rotateRight] = true;
       }
-      if (keyIsPressed[" "] && !keyIsDisabled[" "]) {
+      if (keyIsPressed[controls.hardDrop] && !keyIsDisabled[controls.hardDrop]) {
          gameLocked = true;
          dispatch(gameStateActions.hardDrop());
-         keyIsDisabled[" "] = true;
+         keyIsDisabled[controls.hardDrop] = true;
          setTimeout(() => {
             gameLocked = false;
-         }, 400);
+         }, 350);
       }
-      if (keyIsPressed["Tab"] && !keyIsDisabled["Tab"]) {
+      if (keyIsPressed[controls.hold] && !keyIsDisabled[controls.hold]) {
          dispatch(gameStateActions.holdPiece());
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled["Tab"] = true;
+         keyIsDisabled[controls.hold] = true;
       }
-      if (keyIsPressed["ArrowDown"] && !keyIsDisabled["ArrowDown"]) {
-         keyShiftCounter["ArrowDown"] = 1;
+      if (keyIsPressed[controls.softDrop] && !keyIsDisabled[controls.softDrop]) {
+         keyShiftCounter[controls.softDrop] = 1;
          dispatch(gameStateActions.dropPiece());
-         keyIsDisabled["ArrowDown"] = true;
+         keyIsDisabled[controls.softDrop] = true;
       }
-      if (keyIsPressed["ArrowRight"] && !keyIsDisabled["ArrowRight"]) {
-         keyShiftCounter["ArrowRight"] = 1;
+      if (keyIsPressed[controls.moveRight] && !keyIsDisabled[controls.moveRight]) {
+         keyShiftCounter[controls.moveRight] = 1;
          dispatch(gameStateActions.shiftRight());
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled["ArrowRight"] = true;
+         keyIsDisabled[controls.moveRight] = true;
       }
-      if (keyIsPressed["ArrowLeft"] && !keyIsDisabled["ArrowLeft"]) {
-         keyShiftCounter["ArrowLeft"] = 1;
+      if (keyIsPressed[controls.moveLeft] && !keyIsDisabled[controls.moveLeft]) {
+         keyShiftCounter[controls.moveLeft] = 1;
          dispatch(gameStateActions.shiftLeft());
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled["ArrowLeft"] = true;
+         keyIsDisabled[controls.moveLeft] = true;
       }
    };
    document.onkeydown = (keycode) => {
-      if (keycode.key === "Escape") {
+      if (keycode.key === controls.newGame) {
          setStartGame(true);
          dispatch(gameStateActions.newGame());
-         dispatch(gameStateActions.getNewPiece());
          dispatch(gameStateActions.getGhostCoords());
          dispatch(gameStateActions.showGhostPiece());
       }
@@ -170,12 +170,14 @@ const Game = () => {
          <div
             style={{
                display: "flex",
+               flexWrap:"nowrap"
             }}
          >
             <HeldBlock />
             <Grid></Grid>
             <PieceQueue />
          </div>
+         <StopWatch></StopWatch>
          <HowToPlay></HowToPlay>
       </Fragment>
    );

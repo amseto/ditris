@@ -1,8 +1,10 @@
 import PieceQueuePiece from "./PieceQueuePiece";
 import styles from './PieceQueue.module.css'
 import {pieceQueue} from '../../store/GameState'
+import { useSelector } from "react-redux";
 
 const PieceQueue= (props) =>{
+    const queueChanged= useSelector(state=>state.gameState.heldPiece)
     let i = 0
     let pieces = []
     if (pieceQueue.isEmpty){

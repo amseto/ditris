@@ -1,8 +1,8 @@
 import { child, set } from "@firebase/database";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { getUsernameFromuid, myRoomRef, roomsRef } from "../../modules/firebase-config";
-import { gameStateActions } from "../../store/GameState";
+import { auth, getUsernameFromuid, myRoomRef, onlineUsersRef, roomsRef } from "../../modules/firebase-config";
+import { gameStateActions2 } from "../../store/GameState2";
 import { userInfoActions } from "../../store/UserInfo";
 
 const InviteNotfication = ({ roomKey, opponentuid }) => {
@@ -12,12 +12,17 @@ const InviteNotfication = ({ roomKey, opponentuid }) => {
       setOpponentName(await getUsernameFromuid(opponentuid));
    };
 
-   const acceptInvite = () => {
-      set(child(roomsRef, roomKey + "/accepted"), true);
+   const acceptInvite = async() => {
+      await set(child(roomsRef, roomKey + "/accepted"), true);
+      await set(child(roomsRef,roomKey + "/displayMessage"),"")
+      dispatch(userInfoActions.setOpponentid(opponentuid))
+      dispatch(userInfoActions.setRoomStatus("in room"));
+      dispatch(userInfoActions.setRoomKey(roomKey))
+      dispatch(userInfoActions.setOpponentName(opponentName))
       dispatch(
-         gameStateActions.setMultiplayer({ playerNumber: 2, roomRef: child(roomsRef, roomKey) })
+         gameStateActions2.setMultiplayer({ playerNumber: 2, roomRef: child(roomsRef, roomKey) })
       );
-      dispatch(userInfoActions.setRoomStatus("done waiting"));
+      await set(child(onlineUsersRef,auth.currentUser.uid+"/inRoom"),true)
    };
 
    getOpponentName();

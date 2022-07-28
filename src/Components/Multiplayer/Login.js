@@ -3,6 +3,7 @@ import { child, remove, set } from "firebase/database";
 import { memo, useState } from "react";
 import { useSelector } from "react-redux";
 import { auth, onlineUsersRef } from "../../modules/firebase-config";
+import { myRoomRef } from "../../store/GameState";
 
 
 const Login = () => {
@@ -18,6 +19,10 @@ const Login = () => {
 
    const logoutHandler = async () => {
       remove(child(onlineUsersRef, auth.currentUser.uid));
+      if(myRoomRef){
+         remove(myRoomRef)
+      }
+      
       signOut(auth);
    };
 

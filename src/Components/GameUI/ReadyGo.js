@@ -7,10 +7,9 @@ const ReadyGo = () => {
          style={{
             position: "absolute",
             color: "yellow",
-            marginLeft: 90,
-            marginTop: 240,
+            marginTop: 200,
             fontSize:"300%",
-            width:"100%"
+            flexDirection:"column",
          }}
       >
          {gameState.displayMessage}

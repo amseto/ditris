@@ -5,7 +5,7 @@ import InviteNotfication from "./InviteNotifcation";
 const InviteNotifications = () => {
    let invitations = useSelector((state) => state.userInfo.invitationKeys);
    if (invitations.length!==0) {
-      invitations = invitations.payload.map(({ roomKey, opponentuid }, index) => (
+      invitations = invitations.map(({ roomKey, opponentuid }, index) => (
          <InviteNotfication
             key={index}
             roomKey={roomKey}

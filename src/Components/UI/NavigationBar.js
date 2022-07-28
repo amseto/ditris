@@ -1,6 +1,6 @@
 import styles from "./NavigationBar.module.css";
 
-const NavigationBar = ({ setPage }) => {
+const NavigationBar = ({ setPage,setShowKeyBindings }) => {
    return (
       <ul className={styles["nav-bar"]}>
          <li
@@ -16,6 +16,14 @@ const NavigationBar = ({ setPage }) => {
             }}
          >
             Two-Player
+         </li>
+         <li
+            onClick={() => {
+               setShowKeyBindings(true);
+            }}
+            style={{ float: "right" }}
+         >
+            Set Controls
          </li>
       </ul>
    );

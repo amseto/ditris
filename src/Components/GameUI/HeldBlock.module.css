@@ -1,8 +1,23 @@
+.heldBlock{
+    display: flex;
+    flex-basis:41%;
+    justify-content: flex-end;
+}
 .heldBlock table{
+    margin-right: 24px;
     border-collapse:collapse;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    flex-wrap: nowrap;
     border:0px solid;
     width: 96px;
     height: 72px;
+    align-items: center;
+    justify-content: center;
+}
+.heldBlock tbody{
+    margin-top: 20px;
+}
+.title{
+    text-align: center;
 }

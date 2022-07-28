@@ -1,0 +1,50 @@
+.pieceQueueMine{
+    display: flex;
+    flex-basis:10%;
+    justify-content: flex-start;
+}
+.pieceQueueOpponent{
+    display: flex;
+    flex-basis:40%;
+    justify-content: flex-end;
+    margin-right: 25px;
+}
+
+.pieceQueueMine ul{
+    margin-top: 24px;
+    white-space: nowrap;
+    width: 100px;
+    justify-content: flex-start;
+    
+    
+}
+.pieceQueueOpponent ul{
+    margin-top: 24px;
+    white-space: nowrap;
+    width: 100px;
+    
+    
+}
+
+.pieceQueueMine li{
+    margin-bottom: 24px;
+    list-style-type: none;
+    
+
+}
+.pieceQueueOpponent li{
+    margin-bottom: 24px;
+    list-style-type: none;
+    
+
+}
+.pieceQueueMine table{
+    border-collapse:collapse;
+    border:0px solid;
+
+}
+.pieceQueueOpponent table{
+    border-collapse:collapse;
+    border:0px solid;
+
+}
