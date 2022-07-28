@@ -127,7 +127,7 @@ const placeBlocks = (state, forGhost = false) => {
          state.grid[coord.y][coord.x] = state.currentShape;
       }
    }
-   
+
 };
 
 const coordIsValid = (state, coord, forGhost = false) => {
@@ -266,6 +266,7 @@ const gameStateSlice = createSlice({
             ]);
          }
          state.grid = newGrid;
+         
       },
       getNewPiece(state) {
          if (!state.gameRunning) {
