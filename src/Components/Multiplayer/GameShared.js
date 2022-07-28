@@ -25,10 +25,10 @@ let controlsLocked = false;
 const GameShared = () => {
    const dispatch = useDispatch();
 
-   const controls = useSelector((state)=>state.controls)
+   const controls = useSelector((state) => state.controls);
 
    const playerNumber = useSelector((state) => state.gameState2.playerNumber);
-   const opponentName = useSelector((state)=>state.userInfo.opponentName)
+   const opponentName = useSelector((state) => state.userInfo.opponentName);
 
    const myTurn = useSelector((state) => state.gameState2.myTurn);
    const displayMessage = useSelector((state) => state.gameState2.displayMessage);
@@ -41,7 +41,7 @@ const GameShared = () => {
       }, 1000);
    }
    if (currentGameStatus === "FROZEN") {
-      console.log('this occured')
+      console.log("this occured");
       dispatch(gameStateActions2.unfreeze());
       dispatch(gameStateActions2.clearLines());
       dispatch(gameStateActions2.checkIfGameWon());
@@ -179,7 +179,7 @@ const GameShared = () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       set(child(myRoomRef, "displayMessage"), "GO");
       await new Promise((resolve) => setTimeout(resolve, 500));
-      await set(child(myRoomRef,"grid"),[
+      await set(child(myRoomRef, "grid"), [
          ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
          ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
          ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
@@ -201,9 +201,9 @@ const GameShared = () => {
          ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
          ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
          ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
-      ])
+      ]);
       await set(child(myRoomRef, "displayMessage"), "in game");
-      await set(child(myRoomRef, "/turn"), playerNumber===1?2:1);
+      await set(child(myRoomRef, "/turn"), playerNumber === 1 ? 2 : 1);
    };
 
    onDisconnect(child(onlineUsersRef, auth.currentUser.uid + "/inRoom")).set(false);
@@ -212,10 +212,9 @@ const GameShared = () => {
          if (snapshot.exists()) {
             dispatch(gameStateActions2.setDisplayMessage(snapshot.val()));
             if (snapshot.val() === "READY") {
-               dispatch(gameStateActions2.gettingReady())
+               dispatch(gameStateActions2.gettingReady());
 
                startButtonLocked = true;
-               
             }
          }
       });
@@ -229,10 +228,10 @@ const GameShared = () => {
          }
       });
    }
-   if(gameRunning && !myTurn){
-      onValue(child(myRoomRef,`player${playerNumber}GameInfo/linesCleared`),(snapshot)=>{
-         dispatch(gameStateActions2.setMyLinesCleared(snapshot.val()))
-      })
+   if (gameRunning && !myTurn) {
+      onValue(child(myRoomRef, `player${playerNumber}GameInfo/linesCleared`), (snapshot) => {
+         dispatch(gameStateActions2.setMyLinesCleared(snapshot.val()));
+      });
    }
    //updating the queuePieces
    onValue(child(myRoomRef, `player${playerNumber === 1 ? 2 : 1}GameInfo`), (snapshot) => {
@@ -282,7 +281,15 @@ const GameShared = () => {
             <PieceQueue player="mine"></PieceQueue>
             <LineClearedCounter player="mine" />
          </div>
-         {!gameRunning&&<InputForm/>}
+         {!gameRunning && <InputForm />}
+         <div style={{ color: "yellow" }}>
+            <p>How To Play:</p>
+            <p>Press esc to start.</p>
+            <p>Game starts with other person first.</p>
+            <p>After player drops piece, other player goes.</p>
+            <p>Person that causes the board to overflow loses a line point.</p>
+            <p>Play until a person clears an amount of lines.</p>
+         </div>
       </Fragment>
    );
 };
