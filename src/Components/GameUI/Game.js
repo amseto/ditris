@@ -80,6 +80,8 @@ const Game = () => {
          keyShiftCounter[controls.softDrop] > 40
       ) {
          dispatch(gameStateActions.dropPiece());
+         dispatch(gameStateActions.getGhostCoords());
+         dispatch(gameStateActions.showGhostPiece());
          keyIsDisabled[controls.softDrop] = true;
          keyShiftCounter[controls.softDrop] = 30;
       }
@@ -170,7 +172,8 @@ const Game = () => {
          <div
             style={{
                display: "flex",
-               flexWrap:"nowrap"
+               flexWrap:"nowrap",
+               justifyContent:"center"
             }}
          >
             <HeldBlock />
@@ -178,7 +181,6 @@ const Game = () => {
             <PieceQueue />
          </div>
          <StopWatch></StopWatch>
-         <HowToPlay></HowToPlay>
       </Fragment>
    );
 };

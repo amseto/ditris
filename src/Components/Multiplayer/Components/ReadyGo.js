@@ -1,24 +1,15 @@
+import { memo } from "react";
 import { useSelector } from "react-redux";
+
+import styles from "./ReadyGo.module.css";
 
 const ReadyGo = () => {
    const displayMessage = useSelector((state) => state.gameState2.displayMessage);
    if (displayMessage === "in game") {
-      return;
+      return <div className={styles.readyGo}></div>;
    } else {
-      return (
-         <div
-         style={{
-            position: "absolute",
-            color: "yellow",
-            marginTop: 200,
-            fontSize:"100%",
-            flexDirection:"column",
-         }}
-      >
-            {displayMessage}
-         </div>
-      );
+      return <div className={styles.readyGo}>{displayMessage}</div>;
    }
 };
 
-export default ReadyGo;
+export default memo(ReadyGo);

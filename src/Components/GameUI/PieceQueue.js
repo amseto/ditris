@@ -8,13 +8,13 @@ const PieceQueue= (props) =>{
     let i = 0
     let pieces = []
     if (pieceQueue.isEmpty){
-        return <ul className = {styles.pieceQueue}></ul>
+        return <div className = {styles.pieceQueue}></div>
     }
 
     for (let pieceColor in pieceQueue.elements){
         pieces.push(<PieceQueuePiece key = {i++} color = {pieceQueue.elements[pieceColor]}/>)
     }
-    return <ul className = {styles.pieceQueue}>{pieces}</ul>
+    return <div className = {styles.pieceQueue}>{pieces}</div>
 }
 
 export default PieceQueue;

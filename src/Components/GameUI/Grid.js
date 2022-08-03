@@ -9,19 +9,19 @@ const Grid = () => {
 
    const grid = gameState.grid.slice(1).map((row, y_pos) => {
       return (
-         <tr key={y_pos}>
+         <div style = {{display:"flex"}} key={y_pos}>
             {row.map((color, x_pos) => {
                return <Block color={color} key={x_pos} />;
             })}
-         </tr>
+         </div>
       );
    });
 
    return (
-      <table className={styles.grid}>
-         <tbody>{grid}</tbody>
+      <div className={styles.grid}>
+         {grid}
          <ReadyGo></ReadyGo>
-      </table>
+      </div>
    );
 };
 

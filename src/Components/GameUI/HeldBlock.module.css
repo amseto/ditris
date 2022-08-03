@@ -1,23 +1,19 @@
-.heldBlock{
-    display: flex;
-    flex-basis:41%;
-    justify-content: flex-end;
+.title{
+    text-align: center;
+    text-decoration: underline;
 }
-.heldBlock table{
-    margin-right: 24px;
-    border-collapse:collapse;
+.heldBlockOuter{
     display: flex;
     flex-direction: column;
-    flex-wrap: nowrap;
-    border:0px solid;
+}
+.grid{
+    margin-top: 10px;
+    display:flex;
+    flex-direction: column;
     width: 96px;
     height: 72px;
     align-items: center;
-    justify-content: center;
 }
-.heldBlock tbody{
-    margin-top: 20px;
-}
-.title{
-    text-align: center;
+.gridRow{
+    display:flex;
 }

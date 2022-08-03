@@ -1,0 +1,9 @@
+.readyGo {
+    text-shadow: 2px 2px 2px black;
+   position: absolute;
+   color: yellow;
+   font-size: 100%;
+   flex-direction: column;
+   align-self: center;
+   display: flex;
+}

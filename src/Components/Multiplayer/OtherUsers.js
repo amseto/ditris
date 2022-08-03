@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { useSelector } from "react-redux";
+import Card from "../UI/Card";
 import OtherUser from "./OtherUser";
 
 const OtherUsers = () => {
@@ -10,7 +11,12 @@ const OtherUsers = () => {
         ))
       : null;
    if (otherUserListDisplay) {
-      return <ul>{otherUserListDisplay}</ul>;
+      return (
+         <Card>
+            <div>Available Users</div>
+            {otherUserListDisplay}
+         </Card>
+      );
    }
 };
 export default memo(OtherUsers);

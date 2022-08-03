@@ -1,19 +1,20 @@
-.pieceQueue ul{
+.pieceQueue{
+    margin-left:24px;
     margin-top: 24px;
-    white-space: nowrap;
-    width: 240px;
+    height:336px
     
     
 }
 
-.pieceQueue li{
+.piece{
     margin-bottom: 24px;
-    list-style-type: none;
+    display:flex;
+    flex-direction: column;
     
 
 }
-.pieceQueue table{
-    border-collapse:collapse;
-    border:0px solid;
+.pieceRow{
+    display:flex;
+    
 
 }

@@ -1,16 +1,12 @@
 import { useSelector } from "react-redux";
 
+import styles from './ReadyGo.module.css'
+
 const ReadyGo = () => {
    const gameState = useSelector((state) => state.gameState);
    return (
       <div
-         style={{
-            position: "absolute",
-            color: "yellow",
-            marginTop: 200,
-            fontSize:"300%",
-            flexDirection:"column",
-         }}
+         className = {styles.readyGo}
       >
          {gameState.displayMessage}
       </div>

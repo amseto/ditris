@@ -28,6 +28,8 @@ const KeyControls = () => {
     keyIsPressed[event.key] = false
     keyIsDisabled[event.key] = false;
   });
+
+  
 };
 
 export default KeyControls;

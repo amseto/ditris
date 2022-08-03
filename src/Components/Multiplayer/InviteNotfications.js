@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { useSelector } from "react-redux";
+import Card from "../UI/Card";
 import InviteNotfication from "./InviteNotifcation";
 
 const InviteNotifications = () => {
@@ -13,7 +14,8 @@ const InviteNotifications = () => {
          ></InviteNotfication>
       ));
    }
-   return <div>{invitations}</div>;
+   return <Card>
+      <p style = {{margin:0}}>Room Invitations</p>{invitations}</Card>;
 };
 
 export default memo(InviteNotifications);

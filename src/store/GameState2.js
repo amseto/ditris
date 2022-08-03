@@ -6,6 +6,8 @@ import { auth, getUsernameFromuid } from "../modules/firebase-config";
 
 import Queue from "../modules/piece-queue";
 
+const LINESTOCLEAR = 1
+
 let pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
 const getRandomPiece = () => {
    if (pieceArray.length === 0) {
@@ -55,6 +57,7 @@ const convertMappingToCoords = (state, mapping, forGhost = false) => {
    return coordArray;
 };
 
+
 const gameStateInitialState = {
    playerNumber: null,
 
@@ -103,7 +106,9 @@ const gameStateInitialState = {
    displayMessage: "",
 
    myTurn: null,
-   linesToClear:10,
+   linesToClear:LINESTOCLEAR,
+
+   turnTaken : true
 };
 
 export let myRoomRef = null;
@@ -123,21 +128,23 @@ const removeLastGhostPiece = (state) => {
 };
 
 const placeBlocks = (state, forGhost = false) => {
+   let copiedGrid = state.grid.map(nested=>nested.slice())
    if (forGhost) {
       const colorName = state.myCurrentShape + "ghost";
       for (const coord of state.myGhostCoords) {
-         state.grid[coord.y][coord.x] = colorName;
+         copiedGrid[coord.y][coord.x] = colorName;
          for (const currentCoord of state.myCurrentCoords) {
             if (currentCoord.y === coord.y && currentCoord.x === coord.x) {
-               state.grid[coord.y][coord.x] = state.myCurrentShape;
+               copiedGrid[coord.y][coord.x] = state.myCurrentShape;
             }
          }
       }
    } else {
       for (const coord of state.myCurrentCoords) {
-         state.grid[coord.y][coord.x] = state.myCurrentShape;
+         copiedGrid[coord.y][coord.x] = state.myCurrentShape;
       }
    }
+   state.grid = copiedGrid
 };
 
 const coordIsValid = (state, coord, forGhost = false) => {
@@ -210,14 +217,14 @@ const gameStateSlice2 = createSlice({
          state.displayMessage = "";
 
          state.myTurn = null;
-         state.linesToClear =10;
+         state.linesToClear =LINESTOCLEAR;
          myRoomRef = null;
+         pieceQueue = new Queue()
+
+         state.turnTaken = false
       },
       setGrid(state, grid) {
          state.grid = grid.payload;
-      },
-      sendGrid(state) {
-         set(child(myRoomRef, "grid"), state.grid);
       },
       gettingReady(state) {
          state.myCurrentShape = null;
@@ -250,12 +257,7 @@ const gameStateSlice2 = createSlice({
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
          ];
-         pieceQueue = new Queue();
 
-         set(child(myRoomRef, `player${state.playerNumber}GameInfo`), {
-            gameQueue: pieceQueue.elements,
-            linesCleared: state.myLinesCleared,
-         });
       },
       newGame(state) {
          state.xPos = 3;
@@ -263,13 +265,11 @@ const gameStateSlice2 = createSlice({
          state.rotatePos = 0;
 
          pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
+         pieceQueue = new Queue();
          for (let i = 0; i < 5; i++) {
             pieceQueue.enqueue(...getRandomPiece());
          }
-         set(child(myRoomRef, `player${state.playerNumber}GameInfo`), {
-            gameQueue: pieceQueue.elements,
-            linesCleared: state.myLinesCleared,
-         });
+
       },
       setOpponentInfo(state, action) {
          state.opponentPieceQueue = action.payload.opponentPieceQueue;
@@ -302,15 +302,7 @@ const gameStateSlice2 = createSlice({
          }
          state.grid = newGrid;
          set(child(myRoomRef, "grid"), state.grid);
-         off(child(myRoomRef, `player${state.playerNumber}GameInfo/linesCleared`))
-         set(
-            child(myRoomRef, `player${state.playerNumber}GameInfo/linesCleared`),
-            state.myLinesCleared
-         );
-      },
-      placeCurrentPiece(state) {
-         placeBlocks(state);
-         set(child(myRoomRef, "grid"), state.grid);
+         // off(child(myRoomRef, `player${state.playerNumber}GameInfo/linesCleared`))
       },
       unfreeze(state) {
          state.currentGameStatus = "FALLING";
@@ -370,10 +362,10 @@ const gameStateSlice2 = createSlice({
             );
          }
          placeBlocks(state);
-         set(
-            child(myRoomRef, `player${state.playerNumber}GameInfo/gameQueue`),
-            pieceQueue.elements
-         );
+         // set(
+         //    child(myRoomRef, `player${state.playerNumber}GameInfo/gameQueue`),
+         //    pieceQueue.elements
+         // );
 
          state.currentGameStatus = "FALLING";
       },
@@ -454,7 +446,6 @@ const gameStateSlice2 = createSlice({
       },
       showGhostPiece(state) {
          placeBlocks(state, true);
-         set(child(myRoomRef, "grid"), state.grid);
       },
       shiftLeft(state) {
          removeLastState(state);
@@ -492,15 +483,14 @@ const gameStateSlice2 = createSlice({
          }
          placeBlocks(state);
       },
+      placeCurrentPiece(state){
+         placeBlocks(state)
+      },
+
+      gameWon(state){
+         state.gameRunning = false;
+      },
       checkIfGameWon(state) {
-         if (state.myLinesCleared >= state.linesToClear) {
-            state.gameRunning = false;
-            state.displayMessage = `PLAYER ${state.playerNumber} WON`;
-            getUsernameFromuid(auth.currentUser.uid).then((name) => {
-               set(child(myRoomRef, "displayMessage"), `${name} WON`);
-            });
-         } else {
-         }
       },
       holdPiece(state) {
          if (state.rotated === true) {
@@ -539,7 +529,6 @@ const gameStateSlice2 = createSlice({
          }
          if (state.displayMessage.includes("WON")) {
             state.gameRunning = false;
-            set(child(myRoomRef, "turn"), null);
          }
       },
       setMyTurn(state, bool) {
@@ -550,9 +539,13 @@ const gameStateSlice2 = createSlice({
       },
       setLinesToClear(state,lines){
          state.linesToClear = lines.payload
+      },
+      setTurnTaken(state,bool){
+         state.turnTaken = bool.payload
       }
    },
 });
+
 
 export const gameStateActions2 = gameStateSlice2.actions;
 

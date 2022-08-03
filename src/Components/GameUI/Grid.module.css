@@ -1,6 +1,7 @@
 .grid{
     border-collapse:collapse;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     
 

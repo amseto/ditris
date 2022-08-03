@@ -3,41 +3,39 @@ import styles from "./HeldBlock.module.css";
 import { TETRIMINOS } from "./Tetrimino";
 import { useSelector } from "react-redux";
 import Block from "./Block";
+import { Fragment } from "react";
 
 const HeldBlock = () => {
    const gameState = useSelector((state) => state.gameState);
    if (!gameState.heldPiece) {
       return (
-         <div className={styles.heldBlock}>
-            <table>
-               <tbody>
-                  <tr>
-                     <Block />
-                     <Block />
-                     <Block />
-                     <Block />
-                  </tr>
-                  <tr>
-                     <Block />
-                     <Block />
-                     <Block />
-                     <Block />
-                  </tr>
-                  <tr>
-                     <Block />
-                     <Block />
-                     <Block />
-                     <Block />
-                  </tr>
-               </tbody>
-            </table>
+         <div className={styles.heldBlockOuter}>
+            <div className={styles.title}>Held Piece</div>
+            <div className = {styles.gridRow}>
+               <Block />
+               <Block />
+               <Block />
+               <Block />
+            </div>
+            <div className = {styles.gridRow}>
+               <Block />
+               <Block />
+               <Block />
+               <Block />
+            </div>
+            <div className = {styles.gridRow}>
+               <Block />
+               <Block />
+               <Block />
+               <Block />
+            </div>
          </div>
       );
    }
 
    const convertToPiece = (row, yPos) => {
       return (
-         <tr key={yPos}>
+         <div style={{ display: "flex" }} key={yPos}>
             {row.map((color, xPos) => {
                if (color === 0) {
                   return <Block key={xPos} color={null} />;
@@ -45,18 +43,18 @@ const HeldBlock = () => {
                   return <Block color={gameState.heldPiece} key={xPos} />;
                }
             })}
-         </tr>
+         </div>
       );
    };
 
    let grid = TETRIMINOS[gameState.heldPiece][0].map(convertToPiece);
    return (
-      <div className={styles.heldBlock}>
-         <table>
+      <Fragment>
+         <div className={styles.heldBlockOuter}>
             <div className={styles.title}>Held Piece</div>
-            <tbody>{grid}</tbody>
-         </table>
-      </div>
+            <div className={styles.grid}>{grid}</div>
+         </div>
+      </Fragment>
    );
 };
 

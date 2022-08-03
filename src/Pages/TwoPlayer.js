@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import "../modules/firebase-config";
-import Login from "../Components/Multiplayer/Login";
+import Login from "../Components/UI/Login"
 import OtherUsers from "../Components/Multiplayer/OtherUsers";
 
 import WaitingMessage from "../Components/Multiplayer/WaitingMessage";
@@ -24,10 +24,12 @@ import { auth, onlineUsersRef, roomsRef } from "../modules/firebase-config";
 import LeaveRoom from "../Components/GameUI/LeaveRoom";
 import GameShared from "../Components/Multiplayer/GameShared";
 import { gameStateActions2, myRoomRef } from "../store/GameState2";
+import { useEffect } from "react";
 
 const TwoPlayer = () => {
    const dispatch = useDispatch();
    const userStatus = useSelector((state) => state.userInfo.roomStatus);
+   const isLoggedIn = useSelector((state) => state.userInfo.isLoggedIn);
 
    const playerNumber = useSelector((state) => state.gameState2.playerNumber);
    const roomKey = useSelector((state) => state.userInfo.roomKey);
@@ -138,6 +140,7 @@ const TwoPlayer = () => {
             if (!skip) {
                cancelRoomHandler();
             }
+
             // }
          }
       });
@@ -161,10 +164,10 @@ const TwoPlayer = () => {
    return (
       <Fragment>
          <h1>Ditris Two-Player</h1>
+         {!isLoggedIn && <p>Login to begin</p>}
          {userStatus === "looking for room" && <InviteNotification />}
          {userStatus === "looking for room" && <OtherUsers />}
          {userStatus === "waiting" && <WaitingMessage cancelRoomHandler={cancelRoomHandler} />}
-         <Login></Login>
          {userStatus === "in room" && <LeaveRoom leaveRoomHandler={cancelRoomHandler}></LeaveRoom>}
          {/* {userStatus === "in room" && playerNumber === 1 && <Game></Game>}
          {userStatus === "in room" && playerNumber === 2 && <GetGame></GetGame>} */}

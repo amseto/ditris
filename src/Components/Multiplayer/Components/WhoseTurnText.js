@@ -6,7 +6,7 @@ const WhoseTurnText = () => {
    const myTurn = useSelector((state) => state.gameState2.myTurn);
    const opponentName = useSelector((state) => state.userInfo.opponentName);
    if (!gameRunning) {
-      return <div style={{ textAlign: "center" }}> </div>;;
+      return <div style={{ textAlign: "center",height:"24px"}}> </div>;;
    } else if (myTurn) {
       return <div style={{ textAlign: "center" }}>{`Your Turn`}</div>;
    } else {

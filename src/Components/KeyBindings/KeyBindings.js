@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { controlsActions } from "../../store/Controls";
 import Modal from "../UI/Modal";
@@ -114,4 +114,5 @@ const KeyBindings = ({ setShowKeyBindings }) => {
       </Modal>
    );
 };
-export default KeyBindings;
+
+export default memo(KeyBindings);

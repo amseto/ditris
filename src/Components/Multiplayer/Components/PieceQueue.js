@@ -11,7 +11,7 @@ const PieceQueue = ({ player }) => {
    let pieces = [];
    if (player === "mine") {
       if (pieceQueue.isEmpty) {
-         return <ul className={styles.pieceQueueMine}></ul>;
+         return <div className={styles.pieceQueue}></div>;
       }
 
       for (let pieceColor in pieceQueue.elements) {
@@ -19,14 +19,12 @@ const PieceQueue = ({ player }) => {
       }
       return (
          <Fragment>
-            <div className={styles.pieceQueueMine}>
-               <ul>{pieces}</ul>
-            </div>
+            <div className={styles.pieceQueue}>{pieces}</div>
          </Fragment>
       );
    } else if (player === "opponent") {
       if (!opponentPieces || opponentPieces.isEmpty) {
-         return <ul className={styles.pieceQueueOpponent}></ul>;
+         return <div className={styles.pieceQueue}></div>;
       }
       for (let pieceColor in opponentPieces) {
          if (!pieceColor) {
@@ -36,12 +34,12 @@ const PieceQueue = ({ player }) => {
       }
       return (
          <Fragment>
-            <div className={styles.pieceQueueOpponent}>
-               <ul>{pieces}</ul>
+            <div className={styles.pieceQueue}>
+               {pieces}
             </div>
          </Fragment>
       );
    }
 };
 
-export default memo(PieceQueue);
+export default PieceQueue;

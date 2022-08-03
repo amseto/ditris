@@ -1,4 +1,3 @@
-import { child, set } from "@firebase/database";
 import { createSlice } from "@reduxjs/toolkit";
 
 import { TETRIMINOS } from "../Components/GameUI/Tetrimino";
@@ -112,21 +111,23 @@ const removeLastGhostPiece = (state) => {
 };
 
 const placeBlocks = (state, forGhost = false) => {
+   let copiedGrid = state.grid.map(nested=>nested.slice())
    if (forGhost) {
       const colorName = state.currentShape + "ghost";
       for (const coord of state.ghostCoords) {
-         state.grid[coord.y][coord.x] = colorName;
+         copiedGrid[coord.y][coord.x] = colorName;
          for (const currentCoord of state.currentCoords) {
             if (currentCoord.y === coord.y && currentCoord.x === coord.x) {
-               state.grid[coord.y][coord.x] = state.currentShape;
+               copiedGrid[coord.y][coord.x] = state.currentShape;
             }
          }
       }
    } else {
       for (const coord of state.currentCoords) {
-         state.grid[coord.y][coord.x] = state.currentShape;
+         copiedGrid[coord.y][coord.x] = state.currentShape;
       }
    }
+   state.grid = copiedGrid
 
 };
 
@@ -318,6 +319,9 @@ const gameStateSlice = createSlice({
             if (state.currentPieceState === "LANDING") {
                state.currentPieceState = "FROZEN";
                return;
+            }
+            if(state.currentPieceState ==="FROZEN"){
+               return
             }
             removeLastState(state);
             state.yPos += 1;

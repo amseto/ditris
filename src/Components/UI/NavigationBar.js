@@ -1,6 +1,7 @@
+import Login from "./Login";
 import styles from "./NavigationBar.module.css";
 
-const NavigationBar = ({ setPage,setShowKeyBindings }) => {
+const NavigationBar = ({ setPage, setShowKeyBindings }) => {
    return (
       <ul className={styles["nav-bar"]}>
          <li
@@ -16,6 +17,9 @@ const NavigationBar = ({ setPage,setShowKeyBindings }) => {
             }}
          >
             Two-Player
+         </li>
+         <li style={{ backgroundColor: "#333", float: "right" }}>
+            <Login></Login>
          </li>
          <li
             onClick={() => {
