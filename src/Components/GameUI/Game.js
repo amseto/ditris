@@ -18,7 +18,8 @@ const Game = () => {
    const gameRunning = useSelector((state) => state.gameState.gameRunning);
    const currentPieceState = useSelector((state) => state.gameState.currentPieceState);
    const displayMessage = useSelector((state) => state.gameState.displayMessage);
-   const controls = useSelector((state)=>state.controls)
+   const controls = useSelector((state) => state.controls);
+
 
    const [startGame, setStartGame] = useState(false);
 
@@ -172,8 +173,8 @@ const Game = () => {
          <div
             style={{
                display: "flex",
-               flexWrap:"nowrap",
-               justifyContent:"center"
+               flexWrap: "nowrap",
+               justifyContent: "center",
             }}
          >
             <HeldBlock />

@@ -6,7 +6,7 @@ import { auth, getUsernameFromuid } from "../modules/firebase-config";
 
 import Queue from "../modules/piece-queue";
 
-const LINESTOCLEAR = 1
+const LINESTOCLEAR = 15
 
 let pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
 const getRandomPiece = () => {
@@ -107,8 +107,11 @@ const gameStateInitialState = {
 
    myTurn: null,
    linesToClear:LINESTOCLEAR,
+   lineDeduction:2,
+   keepTurn: 0,
+   keepTurn2:false,
 
-   turnTaken : true
+   turnTaken : false
 };
 
 export let myRoomRef = null;
@@ -216,8 +219,11 @@ const gameStateSlice2 = createSlice({
          state.rotated = false;
          state.displayMessage = "";
 
+         state.keepTurn = 0
+         state.keepTurn2=false;
          state.myTurn = null;
          state.linesToClear =LINESTOCLEAR;
+         state.lineDeduction = Math.floor(LINESTOCLEAR/5)
          myRoomRef = null;
          pieceQueue = new Queue()
 
@@ -302,6 +308,14 @@ const gameStateSlice2 = createSlice({
          }
          state.grid = newGrid;
          set(child(myRoomRef, "grid"), state.grid);
+         if (linesCleared>0){
+            state.keepTurn = state.keepTurn+1
+            // console.log(state.keepTurn)
+            state.keepTurn2 = true
+         }
+         else{
+            state.keepTurn2 = false
+         }
          // off(child(myRoomRef, `player${state.playerNumber}GameInfo/linesCleared`))
       },
       unfreeze(state) {
@@ -347,7 +361,7 @@ const gameStateSlice2 = createSlice({
             off(child(myRoomRef, `player${state.playerNumber === 1 ? 2 : 1}GameInfo`));
             set(
                child(myRoomRef, `player${state.playerNumber === 1 ? 2 : 1}GameInfo/linesCleared`),
-               state.opponentLinesCleared - 1
+               state.opponentLinesCleared - state.lineDeduction
             );
             off(child(myRoomRef, "displayMessage"));
             state.displayMessage = `${opponentName.payload} CAUSED OVERFLOW`;
@@ -490,8 +504,6 @@ const gameStateSlice2 = createSlice({
       gameWon(state){
          state.gameRunning = false;
       },
-      checkIfGameWon(state) {
-      },
       holdPiece(state) {
          if (state.rotated === true) {
             return;
@@ -532,6 +544,7 @@ const gameStateSlice2 = createSlice({
          }
       },
       setMyTurn(state, bool) {
+         // state.keepTurn = 0
          state.myTurn = bool.payload;
       },
       setMyLinesCleared(state, lines) {
@@ -539,10 +552,11 @@ const gameStateSlice2 = createSlice({
       },
       setLinesToClear(state,lines){
          state.linesToClear = lines.payload
+         state.lineDeduction = Math.floor(lines.payload/5)
       },
       setTurnTaken(state,bool){
          state.turnTaken = bool.payload
-      }
+      },
    },
 });
 

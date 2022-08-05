@@ -21,10 +21,9 @@ import {
 } from "@firebase/database";
 import { userInfoActions } from "../store/UserInfo";
 import { auth, onlineUsersRef, roomsRef } from "../modules/firebase-config";
-import LeaveRoom from "../Components/GameUI/LeaveRoom";
 import GameShared from "../Components/Multiplayer/GameShared";
 import { gameStateActions2, myRoomRef } from "../store/GameState2";
-import { useEffect } from "react";
+import LeaveRoom from "../Components/Multiplayer/Components/LeaveRoom";
 
 const TwoPlayer = () => {
    const dispatch = useDispatch();
@@ -169,8 +168,6 @@ const TwoPlayer = () => {
          {userStatus === "looking for room" && <OtherUsers />}
          {userStatus === "waiting" && <WaitingMessage cancelRoomHandler={cancelRoomHandler} />}
          {userStatus === "in room" && <LeaveRoom leaveRoomHandler={cancelRoomHandler}></LeaveRoom>}
-         {/* {userStatus === "in room" && playerNumber === 1 && <Game></Game>}
-         {userStatus === "in room" && playerNumber === 2 && <GetGame></GetGame>} */}
          {userStatus === "in room" && <GameShared></GameShared>}
       </Fragment>
    );

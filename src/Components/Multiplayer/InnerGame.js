@@ -18,15 +18,16 @@ const InnerGame = () => {
    const displayMessage = useSelector((state) => state.gameState2.displayMessage);
    const gameRunning = useSelector((state) => state.gameState2.gameRunning);
    const currentGameStatus = useSelector((state) => state.gameState2.currentGameStatus);
+   const keepTurn = useSelector((state) => state.gameState2.keepTurn);
    const grid = useSelector((state) => state.gameState2.grid);
    useEffect(() => {
-      if (gameRunning && myTurn) {
+      if ((gameRunning && myTurn)) {
+
+         
          off(child(myRoomRef, "grid"));
+         console.log('here')
          dispatch(gameStateActions2.getNewPiece(opponentName));
-         set(
-            child(myRoomRef, `player${playerNumber}GameInfo/gameQueue`),
-            pieceQueue.elements
-         );
+         set(child(myRoomRef, `player${playerNumber}GameInfo/gameQueue`), pieceQueue.elements);
          dispatch(gameStateActions2.placeCurrentPiece());
          dispatch(gameStateActions2.getGhostCoords());
          dispatch(gameStateActions2.showGhostPiece());
@@ -45,7 +46,7 @@ const InnerGame = () => {
             clearInterval(shiftInputInterval);
          };
       }
-   }, [myTurn, gameRunning,dispatch]);
+   }, [myTurn, gameRunning, dispatch,keepTurn]);
 
    const keyShiftHandler = async () => {
       for (let key in keyShiftCounter) {
@@ -59,7 +60,6 @@ const InnerGame = () => {
          keyShiftCounter[controls["softDrop"]] > 40
       ) {
          dispatch(gameStateActions2.dropPiece());
-
          keyIsDisabled[controls["softDrop"]] = true;
          keyShiftCounter[controls["softDrop"]] = 30;
       }
@@ -105,19 +105,15 @@ const InnerGame = () => {
       if (keyIsPressed[controls["hardDrop"]] && !keyIsDisabled[controls["hardDrop"]]) {
          controlsLocked = true;
          dispatch(gameStateActions2.hardDrop());
-         dispatch(gameStateActions2.clearLines());
          keyIsDisabled[controls["hardDrop"]] = true;
-         dispatch(gameStateActions2.setTurnTaken(true));
+         // dispatch(gameStateActions2.setTurnTaken(true));
          setTimeout(() => {
             controlsLocked = false;
-            
          }, 400);
       }
       if (keyIsPressed[controls["softDrop"]] && !keyIsDisabled[controls["softDrop"]]) {
          keyShiftCounter[controls["softDrop"]] = 1;
          dispatch(gameStateActions2.dropPiece());
-         dispatch(gameStateActions2.clearLines());
-         dispatch(gameStateActions2.checkIfGameWon());
          keyIsDisabled[controls["softDrop"]] = true;
       }
       if (keyIsPressed[controls["moveRight"]] && !keyIsDisabled[controls["moveRight"]]) {
@@ -142,9 +138,10 @@ const InnerGame = () => {
    };
    useEffect(() => {
       if (myTurn) {
+         // off(child(myRoomRef, "grid"))
          set(child(myRoomRef, "grid"), grid);
       }
-   }, [grid,myTurn]);
+   }, [grid, myTurn]);
 
    return;
 };

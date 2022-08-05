@@ -10,7 +10,6 @@
     margin-top: 10px;
     display:flex;
     flex-direction: column;
-    width: 96px;
     height: 72px;
     align-items: center;
 }

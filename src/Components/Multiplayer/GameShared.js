@@ -8,15 +8,16 @@ import { auth, getUsernameFromuid, onlineUsersRef } from "../../modules/firebase
 import Grid from "./Components/Grid";
 import PieceQueue from "./Components/PieceQueue";
 import LineClearedCounter from "./Components/LineClearedCounter";
+import WhoseTurnText from "./Components/WhoseTurnText";
+import InputForm from "./Components/InputForm";
+import InnerGame from "./InnerGame";
+import Card from "../UI/Card";
 
 import KeyControls, {
    keyIsDisabled,
    keyIsPressed,
    keyShiftCounter,
 } from "../../modules/KeyControls";
-import WhoseTurnText from "./Components/WhoseTurnText";
-import InputForm from "./Components/InputForm";
-import InnerGame from "./InnerGame";
 
 let startButtonLocked = false;
 
@@ -35,6 +36,7 @@ const GameShared = () => {
    const myLinesCleared = useSelector((state) => state.gameState2.myLinesCleared);
    const linesToClear = useSelector((state) => state.gameState2.linesToClear);
    const turnTaken = useSelector((state) => state.gameState2.turnTaken);
+   const keepTurn2 = useSelector((state) => state.gameState2.keepTurn2);
 
    if (!displayMessage) {
       startButtonLocked = false;
@@ -49,7 +51,6 @@ const GameShared = () => {
    if (currentGameStatus === "FROZEN") {
       dispatch(gameStateActions2.unfreeze());
       dispatch(gameStateActions2.clearLines());
-      dispatch(gameStateActions2.checkIfGameWon());
       dispatch(gameStateActions2.setTurnTaken(true));
    }
 
@@ -61,12 +62,15 @@ const GameShared = () => {
                set(child(myRoomRef, "displayMessage"), `${name} WON`);
             });
             dispatch(gameStateActions2.gameWon());
+         } else if (keepTurn2) {
+            // console.log('keep turn')
          } else {
+            // console.log('other turn')
             set(child(myRoomRef, "turn"), playerNumber === 1 ? 2 : 1);
          }
       }
       dispatch(gameStateActions2.setTurnTaken(false));
-   }, [myLinesCleared, linesToClear, dispatch, turnTaken]);
+   }, [myLinesCleared, linesToClear, dispatch, turnTaken, keepTurn2]);
 
    useEffect(() => {
       if (gameRunning) {
@@ -310,7 +314,7 @@ const GameShared = () => {
             style={{
                display: "flex",
                flexWrap: "nowrap",
-               justifyContent:"center",
+               justifyContent: "center",
             }}
          >
             <LineClearedCounter player="opponent" />
@@ -320,14 +324,16 @@ const GameShared = () => {
             <LineClearedCounter player="mine" />
          </div>
          {!gameRunning && <InputForm />}
-         <div style={{ color: "yellow" }}>
-            <p>How To Play:</p>
-            <p>Press esc to start.</p>
-            <p>Game starts with other person first.</p>
-            <p>After player drops piece, other player goes.</p>
-            <p>Person that causes the board to overflow loses a line point.</p>
-            <p>Play until a person clears an amount of lines.</p>
-         </div>
+         <Card>
+            <div style={{ color: "yellow" }}>
+               <p>How To Play:</p>
+               <p>Press esc to start.</p>
+               <p>Game starts with other person first.</p>
+               <p>After player drops piece, other player goes.</p>
+               <p>Person that causes the board to overflow loses a line point.</p>
+               <p>Play until a person clears an amount of lines.</p>
+            </div>
+         </Card>
       </Fragment>
    );
 };
