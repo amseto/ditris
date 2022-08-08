@@ -1,1 +1,1 @@
-# personal project
+# https://amseto.github.io/ditris/
