@@ -1,1 +1,1 @@
-# https://amseto.github.io/ditris/
+# game link: https://amseto.github.io/ditris/
