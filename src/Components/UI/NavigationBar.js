@@ -4,6 +4,7 @@ import styles from "./NavigationBar.module.css";
 const NavigationBar = ({ setPage, setShowKeyBindings }) => {
    return (
       <ul className={styles["nav-bar"]}>
+         <div>Ditris</div>
          <li
             onClick={() => {
                setPage("singleplayer");
@@ -18,9 +19,7 @@ const NavigationBar = ({ setPage, setShowKeyBindings }) => {
          >
             Two-Player
          </li>
-         <li style={{ backgroundColor: "#333", float: "right" }}>
-            <Login></Login>
-         </li>
+         <Login></Login>
          <li
             onClick={() => {
                setShowKeyBindings(true);

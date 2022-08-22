@@ -3,6 +3,8 @@ import { useDispatch } from "react-redux";
 import { auth,  roomsRef } from "../../modules/firebase-config";
 import { userInfoActions } from "../../store/UserInfo";
 
+import styles from './OtherUser.module.css'
+
 const OtherUser = ({ username, uid }) => {
    const dispatch = useDispatch();
    const pushRoomsRef = push(roomsRef);
@@ -15,8 +17,8 @@ const OtherUser = ({ username, uid }) => {
       dispatch(userInfoActions.setOpponentid(uid));
    };
    return (
-      <li>
-         <button onClick={createRoomHandler}>{username}</button>
+      <li className={styles["OtherUser"]}>
+         <button className={styles["OtherUser"]} onClick={createRoomHandler}>{username}</button>
       </li>
    );
 };

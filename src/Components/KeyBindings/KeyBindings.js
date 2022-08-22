@@ -27,7 +27,7 @@ const KeyBindings = ({ setShowKeyBindings }) => {
             }}
             style={{ float: "right" }}
          >
-            x
+            X
          </button>
          <KeyBinding
             controlName="newGame"

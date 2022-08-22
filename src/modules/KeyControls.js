@@ -10,10 +10,6 @@ const KeyControls = () => {
       event.preventDefault();
       event.stopPropagation();
     }
-    if (event.key === " ") {
-      event.preventDefault();
-      event.stopPropagation();
-    }
     if (event.key === "ArrowDown") {
       event.preventDefault();
       event.stopPropagation();

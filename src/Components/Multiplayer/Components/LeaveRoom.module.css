@@ -1,9 +1,6 @@
-.span{
-    margin-right: 10px;
-}
-.cancel{
-    min-width: 50px;
-    padding:5px 8px;
+.leave-room{
+    min-width: 100px;
+    padding:5px 10px;
     border-radius: 3px;
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;

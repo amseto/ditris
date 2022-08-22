@@ -1,7 +1,7 @@
-import { Fragment, memo, useEffect, useState } from "react";
+import { Fragment, memo, useEffect} from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { gameStateActions2, myRoomRef, grid, pieceQueue } from "../../store/GameState2";
+import { gameStateActions2, myRoomRef, pieceQueue } from "../../store/GameState2";
 import { child, off, onDisconnect, onValue, set } from "@firebase/database";
 import { auth, getUsernameFromuid, onlineUsersRef } from "../../modules/firebase-config";
 
@@ -14,9 +14,6 @@ import InnerGame from "./InnerGame";
 import Card from "../UI/Card";
 
 import KeyControls, {
-   keyIsDisabled,
-   keyIsPressed,
-   keyShiftCounter,
 } from "../../modules/KeyControls";
 
 let startButtonLocked = false;
@@ -92,122 +89,6 @@ const GameShared = () => {
       });
    }, [myLinesCleared, pieceQueue.elements]);
 
-   // useEffect(() => {
-   //    if (gameRunning && myTurn) {
-   //       off(child(myRoomRef, "grid"));
-   //       dispatch(gameStateActions2.getNewPiece(opponentName));
-   //       dispatch(gameStateActions2.placeCurrentPiece(opponentName));
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       const dropPieceInterval = setInterval(() => {
-   //          gameLoop();
-   //       }, 300);
-   //       const handleInputInterval = setInterval(() => {
-   //          keyHandler();
-   //       }, 1);
-   //       const shiftInputInterval = setInterval(() => {
-   //          keyShiftHandler();
-   //       }, 1);
-   //       return () => {
-   //          clearInterval(dropPieceInterval);
-   //          clearInterval(handleInputInterval);
-   //          clearInterval(shiftInputInterval);
-   //       };
-   //    }
-   // }, [myTurn, gameRunning]);
-
-   // const keyShiftHandler = () => {
-   //    for (let key in keyShiftCounter) {
-   //       if (keyShiftCounter[key]) {
-   //          keyShiftCounter[key] += 1;
-   //       }
-   //    }
-   //    if (
-   //       keyIsPressed[controls["softDrop"]] &&
-   //       keyIsDisabled[controls["softDrop"]] &&
-   //       keyShiftCounter[controls["softDrop"]] > 40
-   //    ) {
-   //       console.log(dispatch(gameStateActions2.dropPiece()));
-   //       keyIsDisabled[controls["softDrop"]] = true;
-   //       keyShiftCounter[controls["softDrop"]] = 30;
-   //    }
-   //    if (
-   //       keyIsPressed[controls["moveRight"]] &&
-   //       keyIsDisabled[controls["moveRight"]] &&
-   //       keyShiftCounter[controls["moveRight"]] > 40
-   //    ) {
-   //       dispatch(gameStateActions2.shiftRight());
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       keyIsDisabled[controls["moveRight"]] = true;
-   //       keyShiftCounter[controls["moveRight"]] = 30;
-   //    }
-   //    if (
-   //       keyIsPressed[controls["moveLeft"]] &&
-   //       keyIsDisabled[controls["moveLeft"]] &&
-   //       keyShiftCounter[controls["moveLeft"]] > 40
-   //    ) {
-   //       dispatch(gameStateActions2.shiftLeft());
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       keyIsDisabled[controls["moveLeft"]] = true;
-   //       keyShiftCounter[controls["moveLeft"]] = 30;
-   //    }
-   // };
-   // const keyHandler = async () => {
-   //    if (!gameRunning || controlsLocked) {
-   //       return;
-   //    }
-   //    if (keyIsPressed[controls["rotateLeft"]] && !keyIsDisabled[controls["rotateLeft"]]) {
-   //       dispatch(gameStateActions2.rotatePiece(true));
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       keyIsDisabled[controls["rotateLeft"]] = true;
-   //    }
-   //    if (keyIsPressed[controls["rotateRight"]] && !keyIsDisabled[controls["rotateRight"]]) {
-   //       dispatch(gameStateActions2.rotatePiece(false));
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       keyIsDisabled[controls["rotateRight"]] = true;
-   //    }
-   //    if (keyIsPressed[controls["hardDrop"]] && !keyIsDisabled[controls["hardDrop"]]) {
-   //       controlsLocked = true;
-   //       dispatch(gameStateActions2.hardDrop());
-   //       dispatch(gameStateActions2.clearLines());
-   //       dispatch(gameStateActions2.checkIfGameWon());
-   //       await set(child(myRoomRef, "turn"), playerNumber === 1 ? 2 : 1);
-   //       keyIsDisabled[controls["hardDrop"]] = true;
-   //       setTimeout(() => {
-   //          controlsLocked = false;
-   //       }, 400);
-   //    }
-   //    if (keyIsPressed[controls["softDrop"]] && !keyIsDisabled[controls["softDrop"]]) {
-   //       keyShiftCounter[controls["softDrop"]] = 1;
-   //       dispatch(gameStateActions2.dropPiece());
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       keyIsDisabled[controls["softDrop"]] = true;
-   //    }
-   //    if (keyIsPressed[controls["moveRight"]] && !keyIsDisabled[controls["moveRight"]]) {
-   //       keyShiftCounter[controls["moveRight"]] = 1;
-   //       dispatch(gameStateActions2.shiftRight());
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       keyIsDisabled[controls["moveRight"]] = true;
-   //    }
-   //    if (keyIsPressed[controls["moveLeft"]] && !keyIsDisabled[controls["moveLeft"]]) {
-   //       keyShiftCounter[controls["moveLeft"]] = 1;
-   //       dispatch(gameStateActions2.shiftLeft());
-   //       dispatch(gameStateActions2.getGhostCoords());
-   //       dispatch(gameStateActions2.showGhostPiece());
-   //       keyIsDisabled[controls["moveLeft"]] = true;
-   //    }
-   // };
-   // const gameLoop = async () => {
-   //    dispatch(gameStateActions2.dropPiece());
-   //    dispatch(gameStateActions2.getGhostCoords());
-   //    dispatch(gameStateActions2.showGhostPiece());
-   // };
 
    const beginGame = async () => {
       set(child(myRoomRef, "displayMessage"), "READY");
@@ -292,6 +173,9 @@ const GameShared = () => {
    });
 
    document.onkeydown = (keycode) => {
+      if (keycode.key ===" "){
+         keycode.preventDefault()
+      }
       if (startButtonLocked) {
          return;
       }

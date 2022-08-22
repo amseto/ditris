@@ -1,0 +1,29 @@
+li.login {
+   float: right !important;
+}
+
+
+
+.login {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.login label{
+   margin-right: 2px;
+}
+.login button{
+   margin-left:2px;
+   min-width: 100px;
+    margin:5px;
+    padding:5px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    border-width: 3px;
+}
+.error-text{
+   color:red;
+   text-align: center;
+}
+

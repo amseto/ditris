@@ -1,0 +1,31 @@
+.invite{
+    text-align: center;
+    margin:10px
+}
+.invite span:first-child{
+    font-weight: bold;
+
+}
+.invite span:nth-child(2){
+    padding-right: 20px;
+}
+.accept{
+    min-width: 100px;
+    padding:5px 10px;
+    border-radius: 3px;
+    font-weight: bold;
+    border-width: 2px;
+    border-color:green;
+    background-color: green;
+}
+.decline{
+    min-width: 100px;
+    padding:5px 10px;
+    border-radius: 3px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    font-weight: bold;
+    border-width: 2px;
+    border-color:red;
+    background-color: red;
+}

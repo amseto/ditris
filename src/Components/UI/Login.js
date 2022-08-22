@@ -1,33 +1,36 @@
-import { signInAnonymously, signOut } from "firebase/auth";
+import { onAuthStateChanged, signInAnonymously, signOut } from "firebase/auth";
 import { child, remove, set } from "firebase/database";
-import { Fragment, memo, useState } from "react";
+import { Fragment, memo, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { auth, onlineUsersRef } from "../../modules/firebase-config";
-import { myRoomRef } from "../../store/GameState";
+import { myRoomRef } from "../../store/GameState2";
 import Modal from "./Modal";
+
+import styles from "./Login.module.css";
 
 const Login = () => {
    const isLoggedIn = useSelector((state) => state.userInfo.isLoggedIn);
    const [loggingIn, setLoggingIn] = useState(false);
    const [usernameInput, setUsernameInput] = useState("");
    const [showError, setShowError] = useState(false);
+
    const loginHandler = async (event) => {
       event.preventDefault();
       if (usernameInput.trim().length === 0) {
          setShowError(true);
       } else {
          await signInAnonymously(auth);
-         set(child(onlineUsersRef, auth.currentUser.uid), {
+         await set(child(onlineUsersRef, auth.currentUser.uid), {
             username: usernameInput,
             inRoom: false,
          });
          setUsernameInput("");
-         setLoggingIn(false)
          setShowError(false);
       }
    };
 
    const logoutHandler = async () => {
+      setLoggingIn(false);
       remove(child(onlineUsersRef, auth.currentUser.uid));
       if (myRoomRef) {
          remove(myRoomRef);
@@ -41,11 +44,22 @@ const Login = () => {
    if (!isLoggedIn) {
       return (
          <Fragment>
-            <button onClick = {()=>{setLoggingIn(true)}}>Login</button>
+            <li
+               className={styles["login"]}
+               onClick={() => {
+                  setLoggingIn(true);
+               }}
+            >
+               Login
+            </li>
             {loggingIn && (
-               <Modal onClick = {()=>{setLoggingIn(false)}}>
-                  <form onSubmit={loginHandler}>
-                     <label id="name">Username: </label>
+               <Modal
+                  onClick={() => {
+                     setLoggingIn(false);
+                  }}
+               >
+                  <form className={styles["login"]} onSubmit={loginHandler}>
+                     <label htmlFor="name">Username: </label>
                      <input
                         id="name"
                         value={usernameInput}
@@ -55,14 +69,18 @@ const Login = () => {
                      ></input>
 
                      <button>Login</button>
-                     {showError && errorMessage}
                   </form>
+                  {showError && <div className={styles["error-text"]}>{errorMessage}</div>}
                </Modal>
             )}
          </Fragment>
       );
    } else {
-      return <button onClick={logoutHandler}>Logout</button>;
+      return (
+         <li className={styles["login"]} onClick={logoutHandler}>
+            Logout
+         </li>
+      );
    }
 };
 export default memo(Login);

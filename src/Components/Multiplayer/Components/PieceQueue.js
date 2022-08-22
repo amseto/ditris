@@ -2,7 +2,7 @@ import PieceQueuePiece from "./PieceQueuePiece";
 import styles from "./PieceQueue.module.css";
 import { pieceQueue } from "../../../store/GameState2";
 import { useSelector } from "react-redux";
-import { Fragment, memo } from "react";
+import { Fragment } from "react";
 
 const PieceQueue = ({ player }) => {
    const opponentPieces = useSelector((state) => state.gameState2.opponentPieceQueue);

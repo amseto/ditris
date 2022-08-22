@@ -6,8 +6,8 @@ import Block from "./Block";
 import { Fragment } from "react";
 
 const HeldBlock = () => {
-   const gameState = useSelector((state) => state.gameState);
-   if (!gameState.heldPiece) {
+   const heldPiece = useSelector((state) => state.gameState.heldPiece);
+   if (!heldPiece) {
       return (
          <div className={styles.heldBlockOuter}>
             <div className={styles.title}>Held Piece</div>
@@ -40,14 +40,14 @@ const HeldBlock = () => {
                if (color === 0) {
                   return <Block key={xPos} color={null} />;
                } else {
-                  return <Block color={gameState.heldPiece} key={xPos} />;
+                  return <Block color={heldPiece} key={xPos} />;
                }
             })}
          </div>
       );
    };
 
-   let grid = TETRIMINOS[gameState.heldPiece][0].map(convertToPiece);
+   let grid = TETRIMINOS[heldPiece][0].map(convertToPiece);
    return (
       <Fragment>
          <div className={styles.heldBlockOuter}>

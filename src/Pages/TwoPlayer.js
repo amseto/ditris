@@ -2,12 +2,10 @@ import { Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import "../modules/firebase-config";
-import Login from "../Components/UI/Login"
 import OtherUsers from "../Components/Multiplayer/OtherUsers";
 
 import WaitingMessage from "../Components/Multiplayer/WaitingMessage";
 import InviteNotification from "../Components/Multiplayer/InviteNotfications";
-import Game from "../Components/GameUI/Game";
 import {
    child,
    get,
@@ -57,7 +55,7 @@ const TwoPlayer = () => {
    if (roomKey) {
       onValue(child(roomsRef, roomKey + "/accepted"), (snapshot) => {
          if (!snapshot.exists()) {
-         } else if (snapshot.val()) {
+         } else if (snapshot.val()===true) {
             if (playerNumber !== 2) {
                dispatch(
                   gameStateActions2.setMultiplayer({
@@ -69,7 +67,10 @@ const TwoPlayer = () => {
                set(child(onlineUsersRef, auth.currentUser.uid + "/inRoom"), true);
             }
             // off(child(onlineUsersRef, opponentID))
-         } else {
+         } else if(snapshot.val()==="declined"){
+            cancelRoomHandler()
+         }
+         else{
             dispatch(userInfoActions.setRoomStatus("waiting"));
          }
       });
@@ -162,7 +163,7 @@ const TwoPlayer = () => {
 
    return (
       <Fragment>
-         <h1>Ditris Two-Player</h1>
+         <h2>Two-Player</h2>
          {!isLoggedIn && <p>Login to begin</p>}
          {userStatus === "looking for room" && <InviteNotification />}
          {userStatus === "looking for room" && <OtherUsers />}

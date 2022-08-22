@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import styles from './StopWatch.module.css'
 
 const StopWatch = () => {
    const gameRunning = useSelector((state) => state.gameState.gameRunning);
@@ -17,14 +16,14 @@ const StopWatch = () => {
         setMinutes(() => 0)
          incrementInterval = setInterval(() => {
             setMiliseconds((miliseconds) => miliseconds + 1);
-         }, 100);
+         }, 10);
       }
       return () => {
          clearInterval(incrementInterval);
       };
    }, [gameRunning]);
 
-   if (miliseconds === 10) {
+   if (miliseconds === 100) {
       setSeconds(seconds + 1);
       setMiliseconds(0);
    }
@@ -34,11 +33,14 @@ const StopWatch = () => {
    }
 
    if (minutes) {
-      return <div className={styles.stopWatch}>{`Time ${minutes}:${seconds}:${miliseconds}`}</div>;
+      return <div>{`Time ${minutes}:${seconds}:${miliseconds}`}</div>;
    } else if (seconds) {
-      return <div className={styles.stopWatch}>{`Time ${seconds}:${miliseconds}`}</div>;
+      return <div>{`Time ${seconds}:${miliseconds}`}</div>;
    } else if (miliseconds) {
-      return <div className={styles.stopWatch}>{`Time 0:${miliseconds}`}</div>;
+      return <div>{`Time 0:${miliseconds}`}</div>;
+   }
+   else{
+      return <div>{`Time 0:00`}</div>
    }
 };
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
 const KeyBinding = ({ controlName, input, setInput, currentKey }) => {
    const [bindingBeingChanged, setBindingBeingChanged] = useState(false);
@@ -9,17 +8,17 @@ const KeyBinding = ({ controlName, input, setInput, currentKey }) => {
             setInput(keycode.key);
          }
       };
-   }, [bindingBeingChanged]);
+   }, [bindingBeingChanged,setInput]);
    let displayWord = input;
    if (displayWord === " ") {
       displayWord = "space";
    }
    useEffect(() => {
       setInput(currentKey);
-   },[currentKey]);
+   },[currentKey,setInput]);
    return (
       <div>
-         <label id={controlName}>{`${controlName} `}</label>
+         <label htmlFor={controlName}>{`${controlName} `}</label>
          <input
             onChange={(event) => {
                if (event.target.value.length === 1) {

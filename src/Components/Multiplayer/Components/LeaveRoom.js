@@ -1,11 +1,7 @@
-import Card from "../../UI/Card";
+import styles from "./LeaveRoom.module.css"
 
 const LeaveRoom = ({ leaveRoomHandler }) => {
-   return (
-      <Card>
-         <button onClick={leaveRoomHandler}>Leave Room</button>
-      </Card>
-   );
+   return <button className = {styles["leave-room"]} onClick={leaveRoomHandler}>Leave Room</button>;
 };
 
 export default LeaveRoom;

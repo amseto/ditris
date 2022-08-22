@@ -310,7 +310,6 @@ const gameStateSlice2 = createSlice({
          set(child(myRoomRef, "grid"), state.grid);
          if (linesCleared>0){
             state.keepTurn = state.keepTurn+1
-            // console.log(state.keepTurn)
             state.keepTurn2 = true
          }
          else{

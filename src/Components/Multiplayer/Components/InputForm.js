@@ -1,5 +1,5 @@
 import { child, off, onValue, set } from "@firebase/database";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { gameStateActions2, myRoomRef } from "../../../store/GameState2";
 import Card from "../../UI/Card";
@@ -38,7 +38,7 @@ const InputForm = () => {
             value={linesToClearInput}
             onChange={setLinesToClearInputChange}
          ></input>
-         <button onClick={setLinesToClearHandler}>set</button>
+         <button onClick={setLinesToClearHandler}>SET</button>
          <span> Current amount is {linesToClear}</span>
       </Card>
    );

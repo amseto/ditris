@@ -6,7 +6,8 @@
     font-size: xx-large;
     text-decoration: dotted;
     width:30px;
-    color:red
+    color:red;
+    font:"copper"
 }
 .counterMyself{
     display:flex;

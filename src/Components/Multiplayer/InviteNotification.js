@@ -1,16 +1,13 @@
 import { child, set } from "@firebase/database";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import {
-   auth,
-   getUsernameFromuid,
-   onlineUsersRef,
-   roomsRef,
-} from "../../modules/firebase-config";
+import { auth, getUsernameFromuid, onlineUsersRef, roomsRef } from "../../modules/firebase-config";
 import { gameStateActions2 } from "../../store/GameState2";
 import { userInfoActions } from "../../store/UserInfo";
 
-const InviteNotfication = ({ roomKey, opponentuid }) => {
+import styles from './InviteNotification.module.css'
+
+const InviteNotification = ({ roomKey, opponentuid }) => {
    const dispatch = useDispatch();
    const [opponentName, setOpponentName] = useState(null);
    const getOpponentName = async () => {
@@ -30,14 +27,19 @@ const InviteNotfication = ({ roomKey, opponentuid }) => {
       await set(child(onlineUsersRef, auth.currentUser.uid + "/inRoom"), true);
    };
 
+   const declineInvite = async () => {
+      await set(child(roomsRef, roomKey + "/accepted"), "declined");
+   };
+
    getOpponentName();
    return (
-      <div>
-         {opponentName}
-         <button onClick={acceptInvite}>ACCEPT</button>
-         <button onClick={acceptInvite}>DECLINE</button>
+      <div className={styles["invite"]}>
+         <span>{opponentName}</span>
+         <span> sent you an invite</span>
+         <button className = {styles["accept"]} onClick={acceptInvite}>ACCEPT</button>
+         <button className = {styles["decline"]}  onClick={declineInvite}>DECLINE</button>
       </div>
    );
 };
 
-export default InviteNotfication;
+export default InviteNotification;

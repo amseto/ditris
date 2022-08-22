@@ -1,172 +1,193 @@
-import { Fragment, useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-
+import { Fragment, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import KeyControls, {
+   keyIsDisabled,
+   keyIsPressed,
+   keyShiftCounter,
+} from "../../modules/KeyControls";
 import { gameStateActions } from "../../store/GameState";
+import GameSettingsButton from "./GameSettingsButton";
 import Grid from "./Grid";
-import PieceQueue from "./PieceQueue";
 import HeldBlock from "./HeldBlock";
-
-import { keyShiftCounter, keyIsPressed, keyIsDisabled } from "../../modules/KeyControls";
-import KeyControls from "../../modules/KeyControls";
-import HowToPlay from "./HowToPlay";
+import LinesCleared from "./LinesCleared";
+import PieceQueue from "./PieceQueue";
 import StopWatch from "./StopWatch";
 
-let gameLocked = false;
-
+let startButtonLocked = false;
+let controlsLocked = false;
 const Game = () => {
    const dispatch = useDispatch();
-   const gameRunning = useSelector((state) => state.gameState.gameRunning);
-   const currentPieceState = useSelector((state) => state.gameState.currentPieceState);
-   const displayMessage = useSelector((state) => state.gameState.displayMessage);
+
    const controls = useSelector((state) => state.controls);
 
+   const displayMessage = useSelector((state) => state.gameState.displayMessage);
+   const gameRunning = useSelector((state) => state.gameState.gameRunning);
+   const currentGameStatus = useSelector((state) => state.gameState.currentGameStatus);
+   const gettingPiece = useSelector((state) => state.gameState.gettingPiece);
+   const linesCleared = useSelector((state) => state.gameState.linesCleared);
+   const linesToClear = useSelector((state) => state.gameState.linesToClear);
+   const endTurn = useSelector((state) => state.gameState.endTurn);
 
-   const [startGame, setStartGame] = useState(false);
+   const gameSpeed = useSelector((state) => state.gameState.gameSpeed);
 
-   const gameLoop = () => {
-      if (gameRunning) {
-         if (currentPieceState === "FROZEN") {
-            dispatch(gameStateActions.clearLines());
-            dispatch(gameStateActions.checkIfGameWon());
-            dispatch(gameStateActions.getNewPiece());
-            dispatch(gameStateActions.getGhostCoords());
-            dispatch(gameStateActions.showGhostPiece());
-         } else {
-            dispatch(gameStateActions.dropPiece());
-            dispatch(gameStateActions.getGhostCoords());
-            dispatch(gameStateActions.showGhostPiece());
-         }
+   useEffect(() => {
+      if (displayMessage === "READY") {
+         dispatch(gameStateActions.gettingReadySP());
+      }
+   }, [displayMessage, dispatch]);
+
+   const beginGame = async () => {
+      dispatch(gameStateActions.setDisplayMessageSP("READY"));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      dispatch(gameStateActions.setDisplayMessageSP("GO"));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      startButtonLocked = false;
+      dispatch(gameStateActions.setDisplayMessageSP("in game"));
+      dispatch(gameStateActions.newGameSP());
+   };
+
+   document.onkeydown = (keycode) => {
+      if (startButtonLocked) {
+         return;
+      }
+      if (keycode.key === controls["newGame"]) {
+         startButtonLocked = true;
+         beginGame();
       }
    };
    useEffect(() => {
-      const dropPieceInterval = window.setInterval(() => {
-         gameLoop();
-      }, 300);
-      const handleInputInterval = window.setInterval(() => {
-         keyHandler();
-      }, 1);
-      const shiftInputInterval = window.setInterval(() => {
-         keyShiftHandler();
-      }, 1);
-
-      return () => {
-         window.clearInterval(dropPieceInterval);
-         window.clearInterval(handleInputInterval);
-         window.clearInterval(shiftInputInterval);
-      };
-   });
-   useEffect(() => {
-      if (startGame) {
-         const interval = window.setInterval(() => {
-            dispatch(gameStateActions.gettingReady());
-         }, 500);
-         return () => {
-            window.clearInterval(interval);
-         };
+      if (currentGameStatus === "FROZEN") {
+         dispatch(gameStateActions.clearLinesSP());
       }
-   }, [displayMessage, dispatch, startGame]);
+   }, [currentGameStatus, dispatch]);
+
+   useEffect(() => {
+      if (endTurn) {
+         dispatch(gameStateActions.resetRotationSP());
+         if (linesCleared >= linesToClear) {
+            dispatch(gameStateActions.setGettingNewPieceSP(false));
+            dispatch(gameStateActions.gameWonSP());
+         } else {
+            dispatch(gameStateActions.setGettingNewPieceSP(true));
+         }
+      }
+   }, [linesCleared, linesToClear, dispatch, endTurn]);
+
+   useEffect(() => {
+      if (gettingPiece) {
+         dispatch(gameStateActions.getNewPieceSP());
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+      }
+   }, [gettingPiece, dispatch]);
+
+   const gameLoop = () => {
+      dispatch(gameStateActions.dropPieceSP());
+   };
+
+   const keyHandler = async () => {
+      if (keyIsPressed[controls["rotateLeft"]] && !keyIsDisabled[controls["rotateLeft"]]) {
+         dispatch(gameStateActions.rotatePieceSP(true));
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+         keyIsDisabled[controls["rotateLeft"]] = true;
+      }
+      if (keyIsPressed[controls["rotateRight"]] && !keyIsDisabled[controls["rotateRight"]]) {
+         dispatch(gameStateActions.rotatePieceSP(false));
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+         keyIsDisabled[controls["rotateRight"]] = true;
+      }
+      if (keyIsPressed[controls["hold"]] && !keyIsDisabled[controls["hold"]]) {
+         dispatch(gameStateActions.holdPieceSP());
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+         keyIsDisabled[controls["hold"]] = true;
+      }
+      if (keyIsPressed[controls["hardDrop"]] && !keyIsDisabled[controls["hardDrop"]]) {
+         controlsLocked = true;
+         dispatch(gameStateActions.hardDropSP());
+         keyIsDisabled[controls["hardDrop"]] = true;
+      }
+      if (keyIsPressed[controls["softDrop"]] && !keyIsDisabled[controls["softDrop"]]) {
+         keyShiftCounter[controls["softDrop"]] = 1;
+         dispatch(gameStateActions.dropPieceSP());
+         keyIsDisabled[controls["softDrop"]] = true;
+      }
+      if (keyIsPressed[controls["moveRight"]] && !keyIsDisabled[controls["moveRight"]]) {
+         keyShiftCounter[controls["moveRight"]] = 1;
+         dispatch(gameStateActions.shiftRightSP());
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+         keyIsDisabled[controls["moveRight"]] = true;
+      }
+      if (keyIsPressed[controls["moveLeft"]] && !keyIsDisabled[controls["moveLeft"]]) {
+         keyShiftCounter[controls["moveLeft"]] = 1;
+         dispatch(gameStateActions.shiftLeftSP());
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+         keyIsDisabled[controls["moveLeft"]] = true;
+      }
+   };
 
    const keyShiftHandler = () => {
-      if (!gameRunning || gameLocked) {
-         return;
-      }
       for (let key in keyShiftCounter) {
          if (keyShiftCounter[key]) {
             keyShiftCounter[key] += 1;
          }
       }
       if (
-         keyIsPressed[controls.softDrop] &&
-         keyIsDisabled[controls.softDrop] &&
-         keyShiftCounter[controls.softDrop] > 40
+         keyIsPressed[controls["softDrop"]] &&
+         keyIsDisabled[controls["softDrop"]] &&
+         keyShiftCounter[controls["softDrop"]] > 32
       ) {
-         dispatch(gameStateActions.dropPiece());
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.softDrop] = true;
-         keyShiftCounter[controls.softDrop] = 30;
+         dispatch(gameStateActions.dropPieceSP());
+         keyIsDisabled[controls["softDrop"]] = true;
+         keyShiftCounter[controls["softDrop"]] = 28;
       }
       if (
-         keyIsPressed[controls.moveRight] &&
-         keyIsDisabled[controls.moveRight] &&
-         keyShiftCounter[controls.moveRight] > 40
+         keyIsPressed[controls["moveRight"]] &&
+         keyIsDisabled[controls["moveRight"]] &&
+         keyShiftCounter[controls["moveRight"]] > 32
       ) {
-         dispatch(gameStateActions.shiftRight());
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.moveRight] = true;
-         keyShiftCounter[controls.moveRight] = 30;
+         dispatch(gameStateActions.shiftRightSP());
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+         keyIsDisabled[controls["moveRight"]] = true;
+         keyShiftCounter[controls["moveRight"]] = 28;
       }
       if (
-         keyIsPressed[controls.moveLeft] &&
-         keyIsDisabled[controls.moveLeft] &&
-         keyShiftCounter[controls.moveLeft] > 40
+         keyIsPressed[controls["moveLeft"]] &&
+         keyIsDisabled[controls["moveLeft"]] &&
+         keyShiftCounter[controls["moveLeft"]] > 32
       ) {
-         dispatch(gameStateActions.shiftLeft());
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.moveLeft] = true;
-         keyShiftCounter[controls.moveLeft] = 30;
+         dispatch(gameStateActions.shiftLeftSP());
+         dispatch(gameStateActions.getGhostCoordsSP());
+         dispatch(gameStateActions.showGhostPieceSP());
+         keyIsDisabled[controls["moveLeft"]] = true;
+         keyShiftCounter[controls["moveLeft"]] = 28;
       }
    };
-   const keyHandler = () => {
-      if (!gameRunning || gameLocked) {
-         return;
+
+   useEffect(() => {
+      if (gameRunning) {
+         const dropPieceInterval = setInterval(() => {
+            gameLoop();
+         }, gameSpeed);
+         const handleInputInterval = setInterval(() => {
+            keyHandler();
+         }, 1);
+         const shiftInputInterval = setInterval(() => {
+            keyShiftHandler();
+         }, 1);
+         return () => {
+            clearInterval(dropPieceInterval);
+            clearInterval(handleInputInterval);
+            clearInterval(shiftInputInterval);
+         };
       }
-      if (keyIsPressed[controls.rotateLeft] && !keyIsDisabled[controls.rotateLeft]) {
-         dispatch(gameStateActions.rotatePiece(true));
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.rotateLeft] = true;
-      }
-      if (keyIsPressed[controls.rotateRight] && !keyIsDisabled[controls.rotateRight]) {
-         dispatch(gameStateActions.rotatePiece(false));
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.rotateRight] = true;
-      }
-      if (keyIsPressed[controls.hardDrop] && !keyIsDisabled[controls.hardDrop]) {
-         gameLocked = true;
-         dispatch(gameStateActions.hardDrop());
-         keyIsDisabled[controls.hardDrop] = true;
-         setTimeout(() => {
-            gameLocked = false;
-         }, 350);
-      }
-      if (keyIsPressed[controls.hold] && !keyIsDisabled[controls.hold]) {
-         dispatch(gameStateActions.holdPiece());
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.hold] = true;
-      }
-      if (keyIsPressed[controls.softDrop] && !keyIsDisabled[controls.softDrop]) {
-         keyShiftCounter[controls.softDrop] = 1;
-         dispatch(gameStateActions.dropPiece());
-         keyIsDisabled[controls.softDrop] = true;
-      }
-      if (keyIsPressed[controls.moveRight] && !keyIsDisabled[controls.moveRight]) {
-         keyShiftCounter[controls.moveRight] = 1;
-         dispatch(gameStateActions.shiftRight());
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.moveRight] = true;
-      }
-      if (keyIsPressed[controls.moveLeft] && !keyIsDisabled[controls.moveLeft]) {
-         keyShiftCounter[controls.moveLeft] = 1;
-         dispatch(gameStateActions.shiftLeft());
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-         keyIsDisabled[controls.moveLeft] = true;
-      }
-   };
-   document.onkeydown = (keycode) => {
-      if (keycode.key === controls.newGame) {
-         setStartGame(true);
-         dispatch(gameStateActions.newGame());
-         dispatch(gameStateActions.getGhostCoords());
-         dispatch(gameStateActions.showGhostPiece());
-      }
-   };
+   }, [gameRunning, dispatch, controls]);
+
    return (
       <Fragment>
          <KeyControls />
@@ -181,7 +202,11 @@ const Game = () => {
             <Grid></Grid>
             <PieceQueue />
          </div>
-         <StopWatch></StopWatch>
+         <div style={{display:"flex",flexDirection:"column", textAlign: "center" }}>
+            <StopWatch />
+            <LinesCleared />
+            <GameSettingsButton />
+         </div>
       </Fragment>
    );
 };

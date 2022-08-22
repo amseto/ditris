@@ -8,26 +8,26 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyA9ipNK6_boqbwThQlJgolni-O5iIgIl40",
-  authDomain: "ditris-2244c.firebaseapp.com",
-  databaseURL: "https://ditris-2244c-default-rtdb.firebaseio.com",
-  projectId: "ditris-2244c",
-  storageBucket: "ditris-2244c.appspot.com",
-  messagingSenderId: "743373731037",
-  appId: "1:743373731037:web:9552a80db8b0df8d875734"
+   apiKey: "AIzaSyA9ipNK6_boqbwThQlJgolni-O5iIgIl40",
+   authDomain: "ditris-2244c.firebaseapp.com",
+   databaseURL: "https://ditris-2244c-default-rtdb.firebaseio.com",
+   projectId: "ditris-2244c",
+   storageBucket: "ditris-2244c.appspot.com",
+   messagingSenderId: "743373731037",
+   appId: "1:743373731037:web:9552a80db8b0df8d875734",
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth()
-export const db = getDatabase()
+initializeApp(firebaseConfig);
+export const auth = getAuth();
+export const db = getDatabase();
 export const rootRef = ref(db);
-export const onlineUsersRef = child(rootRef,'users')
-export const roomsRef= child(rootRef,'rooms')
-export const getUsernameFromuid = async (uid) =>{
-  let username;
-  await get(child(onlineUsersRef,uid)).then(snapshot=>{username = snapshot.val().username})
-  return username
-}
-
-
+export const onlineUsersRef = child(rootRef, "users");
+export const roomsRef = child(rootRef, "rooms");
+export const getUsernameFromuid = async (uid) => {
+   let username;
+   await get(child(onlineUsersRef, uid)).then((snapshot) => {
+      username = snapshot.val().username;
+   });
+   return username;
+};

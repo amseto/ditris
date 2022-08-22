@@ -1,17 +1,17 @@
 import { memo } from "react";
 import { useSelector } from "react-redux";
 import Card from "../UI/Card";
-import InviteNotfication from "./InviteNotifcation";
+import InviteNotification from "./InviteNotification";
 
 const InviteNotifications = () => {
    let invitations = useSelector((state) => state.userInfo.invitationKeys);
    if (invitations.length!==0) {
       invitations = invitations.map(({ roomKey, opponentuid }, index) => (
-         <InviteNotfication
+         <InviteNotification
             key={index}
             roomKey={roomKey}
             opponentuid={opponentuid}
-         ></InviteNotfication>
+         ></InviteNotification>
       ));
    }
    return <Card>

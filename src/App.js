@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from "@firebase/auth";
 import { off, remove} from "@firebase/database";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import KeyBindings from "./Components/KeyBindings/KeyBindings";
 import { auth } from "./modules/firebase-config";
 import SinglePlayer from "./Pages/SinglePlayer";
@@ -13,11 +13,12 @@ import NavigationBar from "./Components/UI/NavigationBar";
 
 const App = () => {
    const dispatch = useDispatch();
+   const isLoggedIn = useSelector((state)=>state.userInfo.isLoggedIn)
    const [page, setPage] = useState(<SinglePlayer></SinglePlayer>);
    const [showKeyBindings,setShowKeyBindings] = useState(false)
    const changePageHandler = (pageName) => {
       if (pageName === "singleplayer") {
-         dispatch(gameStateActions.reset());
+         dispatch(gameStateActions.resetSP());
          setPage(<SinglePlayer></SinglePlayer>);
       } else if (pageName === "two-player") {
          if(myRoomRef){
@@ -29,6 +30,9 @@ const App = () => {
    };
 
    onAuthStateChanged(auth, (user) => {
+      if(isLoggedIn){
+         return
+      }
       if (user) {
          dispatch(userInfoActions.login());
          dispatch(userInfoActions.reset())

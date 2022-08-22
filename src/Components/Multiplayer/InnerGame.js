@@ -15,9 +15,7 @@ const InnerGame = () => {
    const opponentName = useSelector((state) => state.userInfo.opponentName);
 
    const myTurn = useSelector((state) => state.gameState2.myTurn);
-   const displayMessage = useSelector((state) => state.gameState2.displayMessage);
    const gameRunning = useSelector((state) => state.gameState2.gameRunning);
-   const currentGameStatus = useSelector((state) => state.gameState2.currentGameStatus);
    const keepTurn = useSelector((state) => state.gameState2.keepTurn);
    const grid = useSelector((state) => state.gameState2.grid);
    useEffect(() => {
@@ -25,7 +23,6 @@ const InnerGame = () => {
 
          
          off(child(myRoomRef, "grid"));
-         console.log('here')
          dispatch(gameStateActions2.getNewPiece(opponentName));
          set(child(myRoomRef, `player${playerNumber}GameInfo/gameQueue`), pieceQueue.elements);
          dispatch(gameStateActions2.placeCurrentPiece());

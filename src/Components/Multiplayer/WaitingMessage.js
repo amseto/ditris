@@ -2,6 +2,8 @@ import {  memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "../UI/Modal";
 
+import styles from './WaitingMessage.module.css'
+
 
 const WaitingMessage = ({ cancelRoomHandler }) => {
    const opponentName = useSelector((state) => state.userInfo.opponentName);
@@ -9,8 +11,8 @@ const WaitingMessage = ({ cancelRoomHandler }) => {
 
    return (
       <Modal>
-         Waiting for {opponentName} to join
-         <button onClick={cancelRoomHandler}>Cancel</button>
+         <span className={styles["span"]}>Waiting for {opponentName} to join...</span>
+         <button className={styles["cancel"]} onClick={cancelRoomHandler}>CANCEL</button>
       </Modal>
    );
 };

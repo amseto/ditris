@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { TETRIMINOS } from "../Components/GameUI/Tetrimino";
-
 import Queue from "../modules/piece-queue";
 
 let pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
+
+const LINESAMOUNT = 40;
 const getRandomPiece = () => {
    if (pieceArray.length === 0) {
       pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
@@ -12,8 +13,6 @@ const getRandomPiece = () => {
    const value = Math.floor(pieceArray.length * Math.random());
    return pieceArray.splice(value, 1);
 };
-
-export let myRoomRef = null;
 
 const getCoords = (type, rotatePos, xPos, yPos) =>
    TETRIMINOS[type][rotatePos].map((row, rowPos) =>
@@ -24,7 +23,6 @@ const getCoords = (type, rotatePos, xPos, yPos) =>
          return null;
       })
    );
-
 const rotatePiece = (isCounterClockwise, state) => {
    let { rotatePos } = state;
    if (isCounterClockwise) {
@@ -57,15 +55,23 @@ const convertMappingToCoords = (state, mapping, forGhost = false) => {
 };
 
 const gameStateInitialState = {
+   playerNumber: null,
+
    gameRunning: false,
    currentShape: null,
    currentCoords: [],
    ghostCoords: [],
-   currentPieceState: "NONE",
+   pieceQueue: null,
+   heldPiece: null,
+   linesCleared: 0,
+   linesToClear: LINESAMOUNT,
+   gameSpeed: 1000,
+
+   currentGameStatus: "NONE",
    rotatePos: 0,
    xPos: 3,
    yPos: 0,
-   totalLinesCleared: 0,
+
    grid: [
       ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
       ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
@@ -89,14 +95,14 @@ const gameStateInitialState = {
       ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
       ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
    ],
-   // winCondition:(state) =>{return state.totalLinesCleared >= 5},
-   pieceQueue: null,
-   isGameWon: false,
-   heldPiece: null,
-   rotated: false,
-   displayMessage: null,
 
+   rotated: false,
+   displayMessage: "",
+   endTurn: false,
+   gettingPiece: false,
 };
+
+export let pieceQueue = new Queue();
 
 const removeLastState = (state) => {
    for (const coord of state.currentCoords) {
@@ -111,7 +117,7 @@ const removeLastGhostPiece = (state) => {
 };
 
 const placeBlocks = (state, forGhost = false) => {
-   let copiedGrid = state.grid.map(nested=>nested.slice())
+   let copiedGrid = state.grid.map((nested) => nested.slice());
    if (forGhost) {
       const colorName = state.currentShape + "ghost";
       for (const coord of state.ghostCoords) {
@@ -127,8 +133,7 @@ const placeBlocks = (state, forGhost = false) => {
          copiedGrid[coord.y][coord.x] = state.currentShape;
       }
    }
-   state.grid = copiedGrid
-
+   state.grid = copiedGrid;
 };
 
 const coordIsValid = (state, coord, forGhost = false) => {
@@ -149,15 +154,26 @@ const coordIsValid = (state, coord, forGhost = false) => {
    return false;
 };
 
-
-export let pieceQueue = new Queue();
-
 const gameStateSlice = createSlice({
-   name: "gameState",
+   name: "gameState2",
    initialState: gameStateInitialState,
    reducers: {
-      reset(state) {
-         pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
+      resetSP(state) {
+         state.playerNumber = null;
+
+         state.gameRunning = false;
+         state.currentShape = null;
+         state.currentCoords = [];
+         state.ghostCoords = [];
+         state.pieceQueue = null;
+         state.heldPiece = null;
+         state.linesCleared = 0;
+
+         state.currentGameStatus = "NONE";
+         state.rotatePos = 0;
+         state.xPos = 3;
+         state.yPos = 0;
+
          state.grid = [
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
@@ -181,19 +197,24 @@ const gameStateSlice = createSlice({
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
          ];
-         state.xPos = 3;
-         state.yPos = 0;
-         state.rotatePos = 0;
-         state.totalLinesCleared = 0;
-         state.displayMessage = null;
-         state.rotated = false
-         state.heldPiece = null
-         state.currentPieceState = "GETTING READY";
-         pieceQueue.empty();
-         state.gameRunning = false;
+
+         state.rotated = false;
+         state.displayMessage = "";
+
+         state.gettingPiece = false;
+         state.endTurn = false;
+
+         pieceQueue = new Queue();
       },
-      newGame(state) {
-         pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
+      gettingReadySP(state) {
+         state.gameRunning = false;
+         state.currentShape = null;
+         state.currentCoords = [];
+         state.ghostCoords = [];
+         state.pieceQueue = null;
+         state.heldPiece = null;
+         state.linesCleared = 0;
+         state.currentGameStatus = "NONE";
          state.grid = [
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
@@ -217,36 +238,26 @@ const gameStateSlice = createSlice({
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
             ["None", "None", "None", "None", "None", "None", "None", "None", "None", "None"],
          ];
-         state.xPos = 3;
-         state.yPos = 0;
-         state.rotatePos = 0;
-         state.totalLinesCleared = 0;
-         state.rotated = false
-         state.heldPiece = null
-         state.displayMessage = "READY";
-         state.currentPieceState = "GETTING READY";
-         pieceQueue.empty();
-         state.gameRunning = false;
-      },
-      gettingReady(state) {
-         if (state.currentPieceState === "GETTING READY") {
-            state.currentPieceState = "BEFORE START";
-            state.displayMessage = "GO!";
-         } else if (state.currentPieceState === "BEFORE START") {
-            state.displayMessage = null;
-            state.gameRunning = true;
-            state.currentShape = getRandomPiece()[0];
-            for (let i = 0; i < 5; i++) {
-               pieceQueue.enqueue(...getRandomPiece());
-            }
+         pieceArray = ["I", "I", "T", "T", "L", "L", "J", "J", "Z", "Z", "S", "S", "O", "O"];
+         pieceQueue = new Queue();
+         for (let i = 0; i < 5; i++) {
+            pieceQueue.enqueue(...getRandomPiece());
          }
       },
-      clearLines(state) {
+      newGameSP(state) {
+         state.xPos = 3;
+         state.yPos = 0;
+         state.rotatePos = 0;
+
+         state.gettingPiece = true;
+         state.gameRunning = true;
+      },
+      clearLinesSP(state) {
          let newGrid = [];
          let linesCleared = 0;
          for (const row of state.grid) {
             if (row.every((blockType) => blockType !== "None")) {
-               state.totalLinesCleared += 1;
+               state.linesCleared += 1;
                linesCleared += 1;
             } else {
                newGrid.push(row);
@@ -267,14 +278,14 @@ const gameStateSlice = createSlice({
             ]);
          }
          state.grid = newGrid;
-         
+         state.endTurn = true;
       },
-      getNewPiece(state) {
-         if (!state.gameRunning) {
-            return;
-         }
+      setGettingNewPieceSP(state, bool) {
+         state.endTurn = false;
+         state.gettingPiece = bool.payload;
+      },
+      getNewPieceSP(state) {
          state.ghostCoords = [];
-         state.rotated = false;
          state.currentShape = pieceQueue.dequeue();
          pieceQueue.enqueue(...getRandomPiece());
          state.xPos = 3;
@@ -286,14 +297,15 @@ const gameStateSlice = createSlice({
          );
          if (state.currentCoords.length < 4) {
             state.gameRunning = false;
+            state.gettingPiece = false;
             state.displayMessage = "YOU LOST";
-            console.log("lost");
-            return;
+         } else {
+            placeBlocks(state);
+            state.currentGameStatus = "FALLING";
+            state.gettingPiece = false;
          }
-         placeBlocks(state);
-         state.currentPieceState = "FALLING";
       },
-      rotatePiece(state, action) {
+      rotatePieceSP(state, action) {
          const originalRotatePos = state.rotatePos;
          state.rotatePos = rotatePiece(action.payload, {
             rotatePos: state.rotatePos,
@@ -310,18 +322,18 @@ const gameStateSlice = createSlice({
                getCoords(state.currentShape, state.rotatePos, state.xPos, state.yPos)
             );
          } else {
-            state.currentPieceState = "FALLING";
+            state.currentGameStatus = "FALLING";
          }
          placeBlocks(state);
       },
-      dropPiece(state) {
+      dropPieceSP(state) {
          if (state.gameRunning) {
-            if (state.currentPieceState === "LANDING") {
-               state.currentPieceState = "FROZEN";
+            if (state.currentGameStatus === "LANDING") {
+               state.currentGameStatus = "FROZEN";
                return;
             }
-            if(state.currentPieceState ==="FROZEN"){
-               return
+            if (state.currentGameStatus === "FROZEN") {
+               return;
             }
             removeLastState(state);
             state.yPos += 1;
@@ -335,52 +347,49 @@ const gameStateSlice = createSlice({
                   state,
                   getCoords(state.currentShape, state.rotatePos, state.xPos, state.yPos)
                );
-               state.currentPieceState = "LANDING";
+               state.currentGameStatus = "LANDING";
             } else {
-               state.currentPieceState = "FALLING";
+               state.currentGameStatus = "FALLING";
             }
             placeBlocks(state);
          } else {
          }
       },
-      getGhostCoords(state) {
-         if (!state.gameRunning) {
-            return;
-         }
-         removeLastGhostPiece(state);
-         state.ghostCoords = [];
-         for (let coord of state.currentCoords) {
-            state.ghostCoords.push({ x: coord.x, y: coord.y });
-         }
-         let ghostYPos = state.yPos;
-         while (state.ghostCoords.length === 4) {
-            ghostYPos += 1;
+      getGhostCoordsSP(state) {
+         if (state.currentCoords.length < 4) {
+         } else {
+            removeLastGhostPiece(state);
+            state.ghostCoords = [];
+            for (let coord of state.currentCoords) {
+               state.ghostCoords.push({ x: coord.x, y: coord.y });
+            }
+            let ghostYPos = state.yPos;
+            while (state.ghostCoords.length === 4) {
+               ghostYPos += 1;
+               state.ghostCoords = convertMappingToCoords(
+                  state,
+                  getCoords(state.currentShape, state.rotatePos, state.xPos, ghostYPos),
+                  true
+               );
+            }
+            ghostYPos -= 1;
             state.ghostCoords = convertMappingToCoords(
                state,
                getCoords(state.currentShape, state.rotatePos, state.xPos, ghostYPos),
                true
             );
          }
-         ghostYPos -= 1;
-         state.ghostCoords = convertMappingToCoords(
-            state,
-            getCoords(state.currentShape, state.rotatePos, state.xPos, ghostYPos),
-            true
-         );
       },
-      hardDrop(state) {
+      hardDropSP(state) {
          removeLastState(state);
          state.currentCoords = state.ghostCoords;
          placeBlocks(state);
-         state.currentPieceState = "FROZEN";
+         state.currentGameStatus = "FROZEN";
       },
-      showGhostPiece(state) {
-         if (!state.gameRunning) {
-            return;
-         }
+      showGhostPieceSP(state) {
          placeBlocks(state, true);
       },
-      shiftLeft(state) {
+      shiftLeftSP(state) {
          removeLastState(state);
          state.xPos -= 1;
          state.currentCoords = convertMappingToCoords(
@@ -394,11 +403,11 @@ const gameStateSlice = createSlice({
                getCoords(state.currentShape, state.rotatePos, state.xPos, state.yPos)
             );
          } else {
-            state.currentPieceState = "FALLING";
+            state.currentGameStatus = "FALLING";
          }
          placeBlocks(state);
       },
-      shiftRight(state) {
+      shiftRightSP(state) {
          removeLastState(state);
          state.xPos += 1;
          state.currentCoords = convertMappingToCoords(
@@ -412,19 +421,19 @@ const gameStateSlice = createSlice({
                getCoords(state.currentShape, state.rotatePos, state.xPos, state.yPos)
             );
          } else {
-            state.currentPieceState = "FALLING";
+            state.currentGameStatus = "FALLING";
          }
          placeBlocks(state);
       },
-      checkIfGameWon(state) {
-         if (state.totalLinesCleared >= 4) {
-            console.log("won");
-            state.isGameWon = true;
-            state.gameRunning = false;
-            state.displayMessage = "YOU WON";
-         }
+
+      gameWonSP(state) {
+         state.gameRunning = false;
+         state.displayMessage = "GAME WON";
       },
-      holdPiece(state) {
+      resetRotationSP(state) {
+         state.rotated = false;
+      },
+      holdPieceSP(state) {
          if (state.rotated === true) {
             return;
          }
@@ -448,12 +457,19 @@ const gameStateSlice = createSlice({
             getCoords(state.currentShape, state.rotatePos, state.xPos, state.yPos)
          );
          placeBlocks(state);
-         state.currentPieceState = "FALLING"
+         state.currentGameStatus = "FALLING";
       },
-
-      // setWinCondition(state,condition){
-      //   state.winCondition = condition;
-      // }
+      setDisplayMessageSP(state, displayMessage) {
+         state.displayMessage = displayMessage.payload;
+      },
+      setSettings(state, settings) {
+         state.linesToClear = settings.payload.linesToClear;
+         state.gameSpeed = settings.payload.gameSpeed;
+      },
+      setSettingsDefault(state) {
+         state.linesToClear = LINESAMOUNT;
+         state.gameSpeed = 1000;
+      },
    },
 });
 

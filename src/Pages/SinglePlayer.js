@@ -1,13 +1,11 @@
-import { useEffect } from "react";
-import { Fragment } from "react";
-import { useSelector } from "react-redux";
+import { Fragment} from "react";
 import Game from "../Components/GameUI/Game";
 
 const SinglePlayer = () => {
 
    return (
       <Fragment>
-         <h1>Ditris</h1>
+         <h2>SinglePlayer</h2>
          <Game></Game>
       </Fragment>
    );

@@ -7,6 +7,7 @@ ul.nav-bar{
 }
 
 ul.nav-bar li{
+    cursor: pointer;
     color: white;
     text-align: center;
     padding: 14px 16px;
@@ -19,4 +20,20 @@ ul.nav-bar li{
 ul.nav-bar li:hover {
     background-color: #000;
 }
+
+ul.nav-bar div{
+    text-align: center;
+    padding-top: 7px;
+    padding-left: 10px;
+    padding-right:10px;
+
+    float: left;
+    display: flex;
+    color: purple;
+    font-size: x-large;
+    font-weight: bold;
+}
+
+
+
 
