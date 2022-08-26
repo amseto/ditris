@@ -25,7 +25,7 @@ const controlsSlice = createSlice({
         state.rotateRight= "ArrowUp";
         state.hold= "c";
       },
-      resetAlbert(state) {
+      resetAlternate(state) {
         state.newGame= "Escape";
         state.moveLeft= "ArrowLeft";
         state.moveRight= "ArrowRight";

@@ -87,10 +87,10 @@ const KeyBindings = ({ setShowKeyBindings }) => {
             </button>
             <button
                onClick={() => {
-                  dispatch(controlsActions.resetAlbert());
+                  dispatch(controlsActions.resetAlternate());
                }}
             >
-               Albert
+               Alternate
             </button>
             <button
                onClick={() => {
